@@ -1,9 +1,9 @@
 import pygame
 from settings import *
-from random import choice, randint
+
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self,groups):
+	def __init__(self, groups):
 		super().__init__(groups)
 
 		# setup
