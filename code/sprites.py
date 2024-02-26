@@ -1,6 +1,8 @@
 import pygame
 from settings import *
-
+from pydantic import BaseModel, validator, conint
+from typing import Any, Tuple, Literal
+from random import choice
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self, groups):
@@ -39,3 +41,30 @@ class Player(pygame.sprite.Sprite):
 		self.pos.x += self.direction.x * self.speed * dt
 		self.rect.x = round(self.pos.x) 
 		self.screen_constraint()
+
+class Ball(pygame.sprite.Sprite):
+	def __init__(self,groups,player):
+		super().__init__(groups)
+
+		# collision objects
+		self.player = player
+
+		#graphics setup
+		self.image = pygame.image.load('assets/other/Ball.png').convert_alpha()
+
+		#position setup
+		self.rect = self.image.get_rect(midbottom = player.rect.midtop)
+		self.pos = pygame.math.Vector2(self.rect.topleft)
+		self.direction = pygame.math.Vector2(((choice((1,-1)),-1)))
+		self.speed = 400
+
+		#active
+		self.active = False
+
+	def update(self,dt):
+		if self.active:
+			pass
+		else:
+			self.rect.midbottom =self.player.rect.midtop
+			self.pos = pygame.math.Vector2(self.rect.topleft)
+

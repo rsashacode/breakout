@@ -1,6 +1,7 @@
 import pygame, sys, time
 from settings import *
-from sprites import Player
+from sprites import Player, Ball
+
 
 
 def create_bg():
@@ -28,6 +29,7 @@ class Game:
 
         # setup
         self.player = Player(self.all_sprites)
+        self.ball = Ball(self.all_sprites,self.player)
     
     def run(self):
         last_time = time.time()
