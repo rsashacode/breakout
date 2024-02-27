@@ -1,7 +1,6 @@
 import pygame, sys, time
 from settings import *
-from sprites import Player, Ball
-
+from sprites import Player, Ball, Scoreboard
 
 
 def create_bg():
@@ -23,6 +22,8 @@ class Game:
 
         # background
         self.bg = create_bg()
+        
+        
 
         # sprites group setup
         self.all_sprites = pygame.sprite.Group()
@@ -30,6 +31,7 @@ class Game:
         # setup
         self.player = Player(self.all_sprites)
         self.ball = Ball(self.all_sprites,self.player)
+        self.scoreboard = Scoreboard(self.all_sprites)
     
     def run(self):
         last_time = time.time()
@@ -41,6 +43,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.ball.active = True
             # update the game
             self.all_sprites.update(dt)
             
