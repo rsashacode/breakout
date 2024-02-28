@@ -1,25 +1,26 @@
+from typing import Iterable
+
 import pygame
-from settings import *
-from pydantic import BaseModel, validator, conint
-from typing import Any, Tuple, Literal
-from random import choice
+import settings
+import random
+
+from pygame.sprite import AbstractGroup
 
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self, groups):
+	def __init__(self, groups: AbstractGroup):
 		super().__init__(groups)
 
 		# setup
-		self.image = pygame.Surface((WINDOW_WIDTH // 10, WINDOW_HEIGHT // 20))
+		self.image = pygame.Surface(size=(settings.WINDOW_WIDTH // 10, settings.WINDOW_HEIGHT // 20))
 		self.image.fill('white')
 
 		# position
-		self.rect = self.image.get_rect(midbottom = (WINDOW_WIDTH // 2,WINDOW_HEIGHT - 20))
+		self.rect = self.image.get_rect(midbottom=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
 		self.old_rect = self.rect.copy()
 		self.direction = pygame.math.Vector2()
-		self.pos = pygame.math.Vector2(self.rect.topleft)
+		self.pos = pygame.math.Vector2(x=self.rect.topleft)
 		self.speed = 300
-
 
 	def input(self):
 		keys = pygame.key.get_pressed()
@@ -31,50 +32,79 @@ class Player(pygame.sprite.Sprite):
 			self.direction.x = 0
 
 	def screen_constraint(self):
-		if self.rect.right > WINDOW_WIDTH - 160:
-			self.rect.right = WINDOW_WIDTH - 160
+		if self.rect.right > settings.WINDOW_WIDTH - 160:
+			self.rect.right = settings.WINDOW_WIDTH - 160
 			self.pos.x = self.rect.x
 		if self.rect.left < 0:
 			self.rect.left = 0
 			self.pos.x = self.rect.x
 
-	def update(self,dt):
+	def update(self, dt: (int, float)):
 		self.old_rect = self.rect.copy()
 		self.input()
 		self.pos.x += self.direction.x * self.speed * dt
 		self.rect.x = round(self.pos.x) 
 		self.screen_constraint()
 
+
+class Scoreboard(pygame.sprite.Sprite):
+	def __init__(self, groups: Iterable[pygame.sprite.Sprite]):
+		super().__init__(groups)
+		self.image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
+		self.image = pygame.transform.scale(self.image, (160, 720))
+		self.rect = self.image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
+
+
+class Block(pygame.sprite.Sprite):
+	def __init__(self, block_type: int, pos: tuple[int, int], groups):
+		super().__init__(groups)
+		self.image = pygame.Surface(size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
+		self.rect = self.image.get_rect(topleft=pos)
+		self.old_rect = self.rect.copy()
+
+		# damage information
+		self.health = int(block_type)
+
+	def get_damage(self, amount: int):
+		self.health -= amount
+
+		if self.health > 0:
+			# update the image
+			pass
+		else:
+			self.kill()
+
+
 class Ball(pygame.sprite.Sprite):
-	def __init__(self,groups,player,blocks):
+	def __init__(self, groups: AbstractGroup, player: Player, blocks: [Block]):
 		super().__init__(groups)
 
-		#collision objects
+		# collision objects
 		self.player = player
 		self.blocks = blocks
 
-		#graphics setup
+		# graphics setup
 		self.image = pygame.image.load('assets/other/Ball.png').convert_alpha()
 
-		#position setup
-		self.rect = self.image.get_rect(midbottom = player.rect.midtop)
+		# position setup
+		self.rect = self.image.get_rect(midbottom=player.rect.midtop)
 		self.old_rect = self.rect.copy()
-		self.pos = pygame.math.Vector2(self.rect.topleft)
-		self.direction = pygame.math.Vector2(((choice((1,-1)),-1)))
+		self.pos = pygame.math.Vector2(x=self.rect.topleft)
+		self.direction = pygame.math.Vector2(x=(random.choice((1, -1)), -1))
 		self.speed = 400
 
-		#active
+		# active
 		self.active = False
 
-	def window_collision(self,direction):
+	def window_collision(self, direction: str):
 		if direction == 'horizontal':
 			if self.rect.left < 0:
 				self.rect.left = 0
 				self.pos.x = self.rect.x
 				self.direction.x *= -1
-		
-			if self.rect.right  > WINDOW_WIDTH - 160:
-				self.rect.right = WINDOW_WIDTH - 160
+
+			if self.rect.right > settings.WINDOW_WIDTH - 160:
+				self.rect.right = settings.WINDOW_WIDTH - 160
 				self.pos.x = self.rect.x
 				self.direction.x *= -1
 
@@ -83,14 +113,13 @@ class Ball(pygame.sprite.Sprite):
 				self.rect.top = 0
 				self.pos.y = self.rect.y
 				self.direction.y *= -1
-			
-			if self.rect.bottom > WINDOW_HEIGHT:
+
+			if self.rect.bottom > settings.WINDOW_HEIGHT:
 				self.active = False
 
-
-	def collision(self,direction):
+	def collision(self, direction):
 		# find overlapping objects
-		overlap_sprites = pygame.sprite.spritecollide(self,self.blocks,False)
+		overlap_sprites = pygame.sprite.spritecollide(sprite=self, group=self.blocks, dokill=False)
 		if self.rect.colliderect(self.player.rect):
 			overlap_sprites.append(self.player)
 
@@ -107,7 +136,7 @@ class Ball(pygame.sprite.Sprite):
 						self.pos.x = self.rect.x
 						self.direction.x *= -1
 
-					if getattr(sprite,'health',None):
+					if getattr(sprite, 'health', None):
 						sprite.get_damage(1)
 
 			if direction == 'vertical':
@@ -122,16 +151,16 @@ class Ball(pygame.sprite.Sprite):
 						self.pos.y = self.rect.y
 						self.direction.y *= -1
 
-					if getattr(sprite,'health',None):
+					if getattr(sprite, 'health', None):
 						sprite.get_damage(1)
 
-	def update(self,dt):
+	def update(self, dt):
 		if self.active:
 
 			if self.direction.magnitude() != 0:
 				self.direction = self.direction.normalize()
 
-			#create old rect
+			# create old rect
 			self.old_rect = self.rect.copy()
 
 			# horizontal movement + collision
@@ -140,37 +169,11 @@ class Ball(pygame.sprite.Sprite):
 			self.collision('horizontal')
 			self.window_collision('horizontal')
 
-			# vertical moovement + collision
+			# vertical movement + collision
 			self.pos.y += self.direction.y * self.speed * dt
 			self.rect.y = round(self.pos.y)
 			self.collision('vertical')
 			self.window_collision('vertical')
 		else:
-			self.rect.midbottom =self.player.rect.midtop
+			self.rect.midbottom = self.player.rect.midtop
 			self.pos = pygame.math.Vector2(self.rect.topleft)
-
-class Scoreboard(pygame.sprite.Sprite):
-    def __init__(self, groups):
-        super().__init__(groups)
-        self.image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (160, 720))
-        self.rect = self.image.get_rect(topright=(WINDOW_WIDTH, 0))
-
-class Block(pygame.sprite.Sprite):
-	def __init__(self,block_type,pos,groups):
-		super().__init__(groups)
-		self.image = pygame.Surface((BLOCK_WIDTH,BLOCK_HEIGHT))
-		self.rect = self.image.get_rect(topleft= pos)
-		self.old_rect = self.rect.copy()
-
-		#damage information
-		self.health = int(block_type)
-
-	def get_damage(self,amount):
-		self.health -= amount
-
-		if self.health > 0:
-			#update the image
-			pass
-		else:
-			self.kill()
