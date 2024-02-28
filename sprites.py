@@ -1,5 +1,3 @@
-from typing import Iterable
-
 import pygame
 import settings
 import random
@@ -20,18 +18,8 @@ class Player(pygame.sprite.Sprite):
 		self.old_rect = self.rect.copy()
 		self.direction = pygame.math.Vector2()
 		self.pos = pygame.math.Vector2(x=self.rect.topleft)
-		self.speed = 300
 
-	def input(self):
-		keys = pygame.key.get_pressed()
-		if keys[pygame.K_RIGHT]:
-			self.direction.x = 1
-		elif keys[pygame.K_LEFT]:
-			self.direction.x = -1
-		else:
-			self.direction.x = 0
-
-	def screen_constraint(self):
+	def check_screen_constraint(self):
 		if self.rect.right > settings.WINDOW_WIDTH - 160:
 			self.rect.right = settings.WINDOW_WIDTH - 160
 			self.pos.x = self.rect.x
@@ -39,16 +27,23 @@ class Player(pygame.sprite.Sprite):
 			self.rect.left = 0
 			self.pos.x = self.rect.x
 
-	def update(self, dt: (int, float)):
+	def update(self, dt: (int, float), keys_pressed: pygame.key.ScancodeWrapper):
 		self.old_rect = self.rect.copy()
-		self.input()
-		self.pos.x += self.direction.x * self.speed * dt
+
+		if keys_pressed[pygame.K_RIGHT]:
+			self.direction.x = 1
+		elif keys_pressed[pygame.K_LEFT]:
+			self.direction.x = -1
+		else:
+			self.direction.x = 0
+
+		self.pos.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * dt
 		self.rect.x = round(self.pos.x) 
-		self.screen_constraint()
+		self.check_screen_constraint()
 
 
 class Scoreboard(pygame.sprite.Sprite):
-	def __init__(self, groups: Iterable[pygame.sprite.Sprite]):
+	def __init__(self, groups):
 		super().__init__(groups)
 		self.image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
 		self.image = pygame.transform.scale(self.image, (160, 720))
@@ -56,27 +51,31 @@ class Scoreboard(pygame.sprite.Sprite):
 
 
 class Block(pygame.sprite.Sprite):
-	def __init__(self, block_type: int, pos: tuple[int, int], groups):
+	def __init__(self, health: int, pos: tuple[int, int], groups):
 		super().__init__(groups)
-		self.image = pygame.Surface(size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
-		self.rect = self.image.get_rect(topleft=pos)
-		self.old_rect = self.rect.copy()
 
 		# damage information
-		self.health = int(block_type)
+		self.health = health
+
+		# Image
+		self.image = pygame.Surface(size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
+		self.image.fill(color=settings.COLOR_LEGEND[self.health])
+
+		self.rect = self.image.get_rect(topleft=pos)
+		self.old_rect = self.rect.copy()
 
 	def get_damage(self, amount: int):
 		self.health -= amount
 
+	def update(self):
 		if self.health > 0:
-			# update the image
-			pass
+			self.image.fill(color=settings.COLOR_LEGEND[self.health])
 		else:
 			self.kill()
 
 
 class Ball(pygame.sprite.Sprite):
-	def __init__(self, groups: AbstractGroup, player: Player, blocks: [Block]):
+	def __init__(self, groups, player: Player, blocks: [Block]):
 		super().__init__(groups)
 
 		# collision objects
@@ -123,36 +122,31 @@ class Ball(pygame.sprite.Sprite):
 		if self.rect.colliderect(self.player.rect):
 			overlap_sprites.append(self.player)
 
-		if overlap_sprites:
+		for ovp_sprite in overlap_sprites:
 			if direction == 'horizontal':
-				for sprite in overlap_sprites:
-					if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
-						self.rect.right = sprite.rect.left - 1
-						self.pos.x = self.rect.x
-						self.direction.x *= -1
+				if self.rect.right >= ovp_sprite.rect.left and self.old_rect.right <= ovp_sprite.old_rect.left:
+					self.rect.right = ovp_sprite.rect.left - 1
+					self.pos.x = self.rect.x
+					self.direction.x *= -1
 
-					if self.rect.left <= sprite.rect.right and self.old_rect.right >= sprite.old_rect.left:
-						self.rect.left = sprite.rect.left + 1
-						self.pos.x = self.rect.x
-						self.direction.x *= -1
-
-					if getattr(sprite, 'health', None):
-						sprite.get_damage(1)
+				if self.rect.left <= ovp_sprite.rect.right and self.old_rect.right >= ovp_sprite.old_rect.left:
+					self.rect.left = ovp_sprite.rect.left + 1
+					self.pos.x = self.rect.x
+					self.direction.x *= -1
 
 			if direction == 'vertical':
-				for sprite in overlap_sprites:
-					if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-						self.rect.bottom = sprite.rect.top - 1
-						self.pos.y = self.rect.y
-						self.direction.y *= -1
+				if self.rect.bottom >= ovp_sprite.rect.top and self.old_rect.bottom <= ovp_sprite.old_rect.top:
+					self.rect.bottom = ovp_sprite.rect.top - 1
+					self.pos.y = self.rect.y
+					self.direction.y *= -1
 
-					if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-						self.rect.top = sprite.rect.bottom + 1
-						self.pos.y = self.rect.y
-						self.direction.y *= -1
+				if self.rect.top <= ovp_sprite.rect.bottom and self.old_rect.top >= ovp_sprite.old_rect.bottom:
+					self.rect.top = ovp_sprite.rect.bottom + 1
+					self.pos.y = self.rect.y
+					self.direction.y *= -1
 
-					if getattr(sprite, 'health', None):
-						sprite.get_damage(1)
+			if getattr(ovp_sprite, 'health', None):
+				ovp_sprite.get_damage(1)
 
 	def update(self, dt):
 		if self.active:
