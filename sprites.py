@@ -120,21 +120,25 @@ class Ball(pygame.sprite.Sprite):
 		self.rect.y = round(self.position.y)
 
 	def frame_collision(self):
+		# Hit the left side of the game window
 		if self.rect.left < 0:
 			self.rect.left = 0
 			self.position.x = 0
 			self.direction.x *= -1
 
+		# Hit the right side of the game window
 		elif self.rect.right > settings.GAME_WINDOW_WIDTH:
 			self.rect.right = settings.GAME_WINDOW_WIDTH
 			self.position.x = self.rect.topleft[0]
 			self.direction.x *= -1
 
+		# Hit the top of the game window
 		if self.rect.top < 0:
 			self.rect.top = 0
 			self.position.y = 0
 			self.direction.y *= -1
 
+		# Hit the bottom of the game window
 		elif self.rect.bottom > settings.GAME_WINDOW_HEIGHT:
 			self.active = False
 
