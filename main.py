@@ -53,7 +53,7 @@ class Game:
         while True:
             clock.tick(settings.FPS)
 
-            dt = time.time() - last_time
+            delta_time = time.time() - last_time
             last_time = time.time()
 
             # Event handling
@@ -68,9 +68,9 @@ class Game:
             keys_pressed = pygame.key.get_pressed()
 
             # update the game
-            self.player.update(dt, keys_pressed)
+            self.player.update(delta_time, keys_pressed)
             self.block_sprites.update()
-            self.ball.update(dt)
+            self.ball.update(delta_time)
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))

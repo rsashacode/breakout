@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
 		self.last_frame_rect = self.rect.copy()
 
 		self.direction = pygame.math.Vector2()
-		self.position = pygame.math.Vector2(x=self.rect.topleft)
+		self.position = pygame.math.Vector2(self.rect.topleft)
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -139,13 +139,16 @@ class Ball(pygame.sprite.Sprite):
 			self.active = False
 
 	def sprites_collision(self):
+		# Get colliding sprites
 		colliding_sprites = self.get_overlapping_sprites()
 		if len(colliding_sprites) > 0:
+			# Introducing variables
 			total_overlap_left = settings.GAME_WINDOW_WIDTH
 			total_overlap_right = 0
 			total_overlap_top = settings.GAME_WINDOW_HEIGHT
 			total_overlap_bottom = 0
 
+			# Calculate the overall area of overlapping
 			for sprite in colliding_sprites:
 				overlap = self.rect.clip(sprite.rect)
 				if overlap.left < total_overlap_left:
