@@ -122,6 +122,7 @@ class Game:
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
             self.all_sprites.draw(surface=self.display_surface)
+            
 
             # update window
             pygame.display.update()

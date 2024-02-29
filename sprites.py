@@ -53,9 +53,22 @@ class Player(GameSprite):
 		self.rect.x = round(self.position.x)
 
 
-class Scoreboard(GameSprite):
-	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
-		super().__init__(groups, image, rect)
+class Scoreboard(pygame.sprite.Sprite):
+	def __init__(self, groups):
+		super().__init__(groups)
+		self.image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
+		self.image = pygame.transform.scale(self.image, (settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT))
+		self.rect = self.image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
+		#heart
+		self.heart_surf = pygame.image.load('./assets/other/heart.png').convert_alpha()
+		self.rect_H = self.heart_surf.get_rect(topright=(600, 0))
+
+	def display_hearts(self):
+		for i in range(3):
+			x = i * self.heart_surf.get_width()
+			self.display_surface.blit(self.heart_surf, (x, 4))
+
+		self.display_hearts()
 
 
 class Block(GameSprite):
