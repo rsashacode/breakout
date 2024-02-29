@@ -3,7 +3,7 @@ import sys
 import time
 import settings
 
-from sprites import Player, Ball, Scoreboard, Block
+from sprites import Player, Ball, Scoreboard, Block, Heart
 
 
 def create_bg():
@@ -29,11 +29,15 @@ class Game:
         # sprites group setup
         self.all_sprites = pygame.sprite.Group()
         self.block_sprites = pygame.sprite.Group()
+        self.player_sprites = pygame.sprite.Group()
         self.ball_sprites = pygame.sprite.Group()
+        self.scoreboard_sprites = pygame.sprite.Group()
+        self.heart_sprites = pygame.sprite.Group()
 
         # initialise_game
-        self.player: Player = self.player_setup()
         self.blocks: list[Block] = self.blocks_setup()
+        self.hearts: list[Heart] = self.hearts_setup()
+        self.player: Player = self.player_setup()
         self.balls: list[Ball] = self.balls_setup(self.player)
         self.scoreboard: Scoreboard = self.scoreboard_setup()
 
@@ -42,9 +46,10 @@ class Game:
         player_image.fill('white')
         player_rect = player_image.get_rect(midbottom=(settings.GAME_WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
         return Player(
-            groups=self.all_sprites,
+            groups=[self.all_sprites, self.player_sprites],
             image=player_image,
-            rect=player_rect
+            rect=player_rect,
+            heart_group=self.heart_sprites
         )
 
     def blocks_setup(self) -> list[Block]:
@@ -85,17 +90,31 @@ class Game:
         ]
         return balls
 
+    def hearts_setup(self) -> list[Heart]:
+        heart_image = pygame.image.load('./assets/other/heart.png').convert_alpha()
+        hearts = []
+        heart_hor_gap = (settings.SCOREBOARD_WIDTH - 20 * 2) // 3
+        for i in range(settings.MAX_PLAYER_HEALTH):
+            heart_rect = heart_image.get_rect(
+                midtop=(settings.GAME_WINDOW_WIDTH + (i + 1) * heart_hor_gap, settings.GAME_WINDOW_HEIGHT // 10)
+            )
+            heart = Heart(
+                    groups=[self.all_sprites, self.heart_sprites],
+                    image=heart_image,
+                    rect=heart_rect
+                )
+            hearts.append(heart)
+        return hearts
+
     def scoreboard_setup(self):
-        scoreboard_image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
-        scoreboard_image = pygame.transform.scale(
-            scoreboard_image,
-            (settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT)
-        )
-        scoreboard_rect = scoreboard_image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
+        scoreboard_image = pygame.image.load('./assets/other/scoreboard.jpg').convert_alpha()
+        scoreboard_image = pygame.transform.scale(scoreboard_image, (settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT))
+        scoreboard_rectangle = scoreboard_image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
+
         return Scoreboard(
-            groups=self.all_sprites,
+            groups=[self.all_sprites, self.scoreboard_sprites],
             image=scoreboard_image,
-            rect=scoreboard_rect
+            rect=scoreboard_rectangle,
         )
 
     def run(self):
@@ -118,11 +137,17 @@ class Game:
             self.player.update(delta_time, keys_pressed)
             self.block_sprites.update()
             self.ball_sprites.update(delta_time, keys_pressed)
+            self.heart_sprites.update()
+            # self.scoreboard_sprites.update()
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
-            self.all_sprites.draw(surface=self.display_surface)
-            
+            # self.all_sprites.draw(surface=self.display_surface)
+            self.player_sprites.draw(self.display_surface)
+            self.ball_sprites.draw(self.display_surface)
+            self.block_sprites.draw(surface=self.display_surface)
+            self.scoreboard_sprites.draw(surface=self.display_surface)
+            self.heart_sprites.draw(surface=self.display_surface)
 
             # update window
             pygame.display.update()

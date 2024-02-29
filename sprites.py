@@ -2,6 +2,7 @@ import pygame
 import settings
 import random
 import math
+import time
 
 from pygame.sprite import AbstractGroup
 
@@ -21,10 +22,22 @@ class GameSprite(pygame.sprite.Sprite):
 		raise NotImplemented('Sprite must implement "update" method')
 
 
+class Heart(GameSprite):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
+		super().__init__(groups, image, rect)
+		self.active = True
+
+	def update(self):
+		if not self.active:
+			self.kill()
+
+
 class Player(GameSprite):
-	def __init__(self, groups: AbstractGroup, image: pygame.Surface, rect: pygame.Rect):
+	def __init__(self, groups: AbstractGroup, image: pygame.Surface, rect: pygame.Rect, heart_group: [Heart]):
 		super().__init__(groups, image, rect)
 		self.direction = pygame.math.Vector2()
+		self.health = settings.MAX_PLAYER_HEALTH
+		self.heart_group = heart_group
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -37,6 +50,17 @@ class Player(GameSprite):
 
 	def move_paddle(self, delta_time):
 		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
+
+	def loose_health(self):
+		if self.health >= 1:
+			self.health -= 1
+			heart_sprites = self.heart_group.sprites()
+			heart_sprites[-1].active = False
+
+	def get_health(self):
+		if self.health < settings.MAX_PLAYER_HEALTH:
+			self.health += 1
+			# ToDo Initialise new Heart Object
 
 	def update(self, delta_time, keys_pressed: pygame.key.ScancodeWrapper):
 		self.last_frame_rect = self.rect.copy()
@@ -51,24 +75,6 @@ class Player(GameSprite):
 		self.check_screen_constraint()
 		self.move_paddle(delta_time)
 		self.rect.x = round(self.position.x)
-
-
-class Scoreboard(pygame.sprite.Sprite):
-	def __init__(self, groups):
-		super().__init__(groups)
-		self.image = pygame.image.load('assets/other/scoreboard.jpg').convert_alpha()
-		self.image = pygame.transform.scale(self.image, (settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT))
-		self.rect = self.image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
-		#heart
-		self.heart_surf = pygame.image.load('./assets/other/heart.png').convert_alpha()
-		self.rect_H = self.heart_surf.get_rect(topright=(600, 0))
-
-	def display_hearts(self):
-		for i in range(3):
-			x = i * self.heart_surf.get_width()
-			self.display_surface.blit(self.heart_surf, (x, 4))
-
-		self.display_hearts()
 
 
 class Block(GameSprite):
@@ -100,6 +106,7 @@ class Ball(GameSprite):
 		self.direction = pygame.math.Vector2(x=(random.choice((1, -1)), -1))
 		self.speed = settings.DEFAULT_BALL_SPEED
 
+		self.time_delay_counter = 0
 		self.active = False
 
 	def movement(self, delta_time):
@@ -107,6 +114,11 @@ class Ball(GameSprite):
 		self.position.y += self.direction.y * self.speed * delta_time
 		self.rect.x = round(self.position.x)
 		self.rect.y = round(self.position.y)
+
+	def loose_the_ball(self):
+		self.active = False
+		self.time_delay_counter = time.time()
+		self.player.loose_health()
 
 	def frame_collision(self):
 		# Hit the left side of the game window
@@ -128,8 +140,8 @@ class Ball(GameSprite):
 			self.direction.y *= -1
 
 		# Hit the bottom of the game window
-		elif self.rect.bottom > settings.GAME_WINDOW_HEIGHT:
-			self.active = False
+		elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
+			self.loose_the_ball()
 
 	def get_overlapping_sprites(self) -> [pygame.sprite.Sprite]:
 		overlap_sprites = pygame.sprite.spritecollide(self, self.blocks, False)
@@ -199,12 +211,9 @@ class Ball(GameSprite):
 				self.rect.top = overlapping_rect.bottom
 			else:
 				self.rect.bottom = overlapping_rect.top
-		# Horizontal collision
-		elif overlapping_rect.height > overlapping_rect.width:
-			self.active = False
-		# Vertical and horizontal collision (perfectly hit an angle)
+		# Horizontal collision and Vertical and horizontal collision (perfectly hit an angle)
 		else:
-			self.active = False
+			self.loose_the_ball()
 
 		hit_point_x = overlapping_rect.centerx
 		paddle_middle = self.player.rect.centerx
@@ -250,13 +259,22 @@ class Ball(GameSprite):
 			self.last_frame_position = self.position.copy()
 
 			self.movement(delta_time)
-
 			self.frame_collision()
 			self.sprite_collisions()
 		else:
-			self.rect.midbottom = self.player.rect.midtop
-			self.position = pygame.math.Vector2(self.rect.topleft)
+			if time.time() - self.time_delay_counter > 0.5:
+				self.rect.midbottom = self.player.rect.midtop
+				self.position = pygame.math.Vector2(self.rect.topleft)
 
 			if keys_pressed[pygame.K_SPACE]:
 				self.active = True
 				self.direction = pygame.math.Vector2(x=(random.choice((1, -1)), -1))
+
+
+class Scoreboard(GameSprite):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
+		super().__init__(groups, image, rect)
+
+	def update(self):
+		pass
+
