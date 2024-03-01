@@ -7,7 +7,7 @@ import time
 from pygame.sprite import AbstractGroup
 
 
-class GameSprite(pygame.sprite.Sprite):
+class GameSprite(pygame.sprite.DirtySprite):
 	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
 		super().__init__(groups)
 
@@ -77,25 +77,47 @@ class Player(GameSprite):
 		self.rect.x = round(self.position.x)
 
 
-class Block(GameSprite):
-	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, health: int):
-		self.health = health
-		image = settings.COLOR_LEGEND[self.health]
+class PowerUp(GameSprite):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
 		super().__init__(groups, image, rect)
-		
-		
-		
+		self.speed = settings.DEFAULT_POWERUP_SPEED
+		self.dirty = 0
+		self.visible = 0
+
+	def update(self):
+		self.rect.y += self.speed
+		# for power_up in self.power_up_sprites:
+		# 	if pygame.sprite.collide_rect(power_up, self.player):
+		# 		power_up.kill()
+		#
+		# # Check if any power-up has reached the bottom of the screen, and if so, remove it.
+		# for power_up in self.power_up_sprites.copy():
+		# 	if power_up.rect.top > settings.WINDOW_HEIGHT:
+		# 		self.power_up_sprites.remove(power_up)
+		# if self.rect.top > settings.GAME_WINDOW_HEIGHT:
+		# 	self.kill()
+
+
+class Block(GameSprite):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, health: int, power_up: [PowerUp, None]):
+		super().__init__(groups, image, rect)
+		self.health = health
+		self.power_up = power_up
+
 	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
+
+	def activate_powerup(self):
+		self.power_up.visible = 1
+		self.power_up.dirty = 2
 
 	def update(self):
 		self.last_frame_rect = self.rect.copy()
 		if self.health <= 0:
 			self.kill()
-			if random.random() < 0.3:
-				power_up = PowerUp(self.rect.centerx, self.rect.bottom)
-				self.groups()[0].add(power_up)
+			if self.power_up is not None:
+				self.activate_powerup()
 
 
 class Ball(GameSprite):
@@ -280,16 +302,3 @@ class Scoreboard(GameSprite):
 
 	def update(self):
 		pass
-
-class PowerUp(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = random.choice(settings.POWER_UP_IMAGES)
-        self.rect = self.image.get_rect(topleft=(x, y))
-        self.speed = 400
-
-    def update(self):
-        self.rect.y += self.speed
-        if self.rect.top > settings.GAME_WINDOW_HEIGHT:
-            self.kill()
-        # 这里需要添加逻辑来处理与player的碰撞，如果有碰撞，则调用self.kill()

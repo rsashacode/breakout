@@ -2,8 +2,9 @@ import pygame
 import sys
 import time
 import settings
+import random
 
-from sprites import Player, Ball, Scoreboard, Block, Heart
+from sprites import Player, Ball, Scoreboard, Block, Heart, PowerUp
 
 
 def create_bg():
@@ -36,7 +37,8 @@ class Game:
         self.power_up_sprites = pygame.sprite.Group()
 
         # initialise_game
-        self.blocks: list[Block] = self.blocks_setup()
+        self.power_ups: list[list[PowerUp]] = self.power_ups_setup()
+        self.blocks: list[list[Block]] = self.blocks_setup()
         self.hearts: list[Heart] = self.hearts_setup()
         self.player: Player = self.player_setup()
         self.balls: list[Ball] = self.balls_setup(self.player)
@@ -53,10 +55,11 @@ class Game:
             heart_group=self.heart_sprites
         )
 
-    def blocks_setup(self) -> list[Block]:
+    def blocks_setup(self) -> list[list[Block]]:
         # cycle through all rows and columns of BLOCK_MAP
         blocks = []
         for row_index, row in enumerate(settings.BLOCK_MAP):
+            block_row = []
             for col_index, health in enumerate(row):
                 if health != ' ':
                     health = int(health)
@@ -65,22 +68,50 @@ class Game:
                     y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
 
                     # Load the image for the block based on the health value
-                    block_image = settings.COLOR_LEGEND[health]
+                    block_image = pygame.image.load(settings.COLOR_LEGEND[health])
 
                     # Scale the image to fit the BLOCK_WIDTH and BLOCK_HEIGHT
                     block_image = pygame.transform.scale(block_image, (settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
 
                     block_rect = block_image.get_rect(topleft=(x, y))
-                    blocks.append(
+
+                    # Check if power up exists
+                    power_up = self.power_ups[row_index][col_index]
+
+                    block_row.append(
                         Block(
                             groups=[self.all_sprites, self.block_sprites],
                             image=block_image,
                             rect=block_rect,
-                            health=health
+                            health=health,
+                            power_up=power_up
                         )
                     )
+            blocks.append(block_row)
         return blocks
 
+    def power_ups_setup(self) -> list[list[PowerUp]]:
+        power_ups = []
+        for row_index, row in enumerate(settings.BLOCK_MAP):
+            power_ups_row = []
+            for col_index, block_present in enumerate(row):
+                if block_present != ' ': # and random.random() < 0.3:
+                    x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
+                    y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
+
+                    power_up_image = pygame.image.load(random.choice(settings.POWER_UP_IMAGES))
+                    power_up_rect = power_up_image.get_rect(topleft=(x, y))
+
+                    power_up = PowerUp(
+                        groups=[self.all_sprites, self.power_up_sprites],
+                        image=power_up_image,
+                        rect=power_up_rect
+                    )
+                    power_ups_row.append(power_up)
+                else:
+                    power_ups_row.append(None)
+            power_ups.append(power_ups_row)
+        return power_ups
 
     def balls_setup(self, player):
         ball_image = pygame.image.load('./assets/other/Ball.png').convert_alpha()
@@ -146,25 +177,14 @@ class Game:
             self.power_up_sprites.update()
             # self.scoreboard_sprites.update()
 
-            # Check collision between power-up sprite and player sprite.
-            for power_up in self.power_up_sprites:
-                if pygame.sprite.collide_rect(power_up, self.player):
-                    power_up.kill()
-            
-            # Check if any power-up has reached the bottom of the screen, and if so, remove it.
-            for power_up in self.power_up_sprites.copy():
-                if power_up.rect.top > settings.WINDOW_HEIGHT:
-                    self.power_up_sprites.remove(power_up)
-
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
-            # self.all_sprites.draw(surface=self.display_surface)
-            self.player_sprites.draw(self.display_surface)
-            self.ball_sprites.draw(self.display_surface)
+            self.player_sprites.draw(surface=self.display_surface)
+            self.ball_sprites.draw(surface=self.display_surface)
             self.block_sprites.draw(surface=self.display_surface)
             self.scoreboard_sprites.draw(surface=self.display_surface)
             self.heart_sprites.draw(surface=self.display_surface)
-            self.power_up_sprites.draw(self.display_surface)
+            self.power_up_sprites.draw(surface=self.display_surface)
 
             # update window
             pygame.display.update()
