@@ -63,8 +63,11 @@ class Game:
                     x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
                     y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
 
-                    block_image = pygame.Surface(size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
-                    block_image.fill(color=settings.COLOR_LEGEND[health])
+                    # Load the image for the block based on the health value
+                    block_image = settings.COLOR_LEGEND[health]
+
+                    # Scale the image to fit the BLOCK_WIDTH and BLOCK_HEIGHT
+                    block_image = pygame.transform.scale(block_image, (settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT))
 
                     block_rect = block_image.get_rect(topleft=(x, y))
                     blocks.append(
@@ -76,6 +79,7 @@ class Game:
                         )
                     )
         return blocks
+
 
     def balls_setup(self, player):
         ball_image = pygame.image.load('./assets/other/Ball.png').convert_alpha()

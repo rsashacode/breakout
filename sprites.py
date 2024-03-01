@@ -79,10 +79,11 @@ class Player(GameSprite):
 
 class Block(GameSprite):
 	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, health: int):
-		super().__init__(groups, image, rect)
-
-		# damage information
 		self.health = health
+		image = settings.COLOR_LEGEND[self.health]
+		super().__init__(groups, image, rect)
+		# damage information
+		
 
 	def get_damage(self, amount: int):
 		self.health -= amount
@@ -90,7 +91,7 @@ class Block(GameSprite):
 	def update(self):
 		self.last_frame_rect = self.rect.copy()
 		if self.health > 0:
-			self.image.fill(color=settings.COLOR_LEGEND[self.health])
+			self.image = settings.COLOR_LEGEND[self.health]
 		else:
 			self.kill()
 

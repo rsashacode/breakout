@@ -1,3 +1,4 @@
+import pygame 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -27,24 +28,14 @@ BLOCK_MAP = [
 	'            ',
 	'            ']
 
-# COLOR_LEGEND = {
-# 	'1': 'blue',
-# 	'2': 'green',
-# 	'3': 'red',
-# 	'4': 'orange',
-# 	'5': 'purple',
-# 	'6': 'bronze',
-# 	'7': 'grey',
-# }
-
 COLOR_LEGEND = {
-	1: (255, 255, 255),
-	2: (212, 212, 212),
-	3: (169, 169, 169),
-	4: (126, 126, 126),
-	5: (83, 83, 83),
-	6: (40, 40, 40),
-	7: (0, 0, 0)
+	1: pygame.image.load('./assets/blocks/blue.png'),
+	2: pygame.image.load('./assets/blocks/bronce.png'),
+	3: pygame.image.load('./assets/blocks/green.png'),
+	4: pygame.image.load('./assets/blocks/grey.png'),
+	5: pygame.image.load('./assets/blocks/orange.png'),
+	6: pygame.image.load('./assets/blocks/purple.png'),
+	7: pygame.image.load('./assets/blocks/red.png')
 }
 
 GAP_SIZE = 2
