@@ -33,6 +33,7 @@ class Game:
         self.ball_sprites = pygame.sprite.Group()
         self.scoreboard_sprites = pygame.sprite.Group()
         self.heart_sprites = pygame.sprite.Group()
+        self.power_up_sprites = pygame.sprite.Group()
 
         # initialise_game
         self.blocks: list[Block] = self.blocks_setup()
@@ -95,7 +96,7 @@ class Game:
         return balls
 
     def hearts_setup(self) -> list[Heart]:
-        heart_image = pygame.image.load('./assets/other/heart.png').convert_alpha()
+        heart_image = pygame.image.load('./assets/other/heart_s.png').convert_alpha()
         hearts = []
         heart_hor_gap = (settings.SCOREBOARD_WIDTH - 20 * 2) // 3
         for i in range(settings.MAX_PLAYER_HEALTH):
@@ -142,7 +143,18 @@ class Game:
             self.block_sprites.update()
             self.ball_sprites.update(delta_time, keys_pressed)
             self.heart_sprites.update()
+            self.power_up_sprites.update()
             # self.scoreboard_sprites.update()
+
+            # Check collision between power-up sprite and player sprite.
+            for power_up in self.power_up_sprites:
+                if pygame.sprite.collide_rect(power_up, self.player):
+                    power_up.kill()
+            
+            # Check if any power-up has reached the bottom of the screen, and if so, remove it.
+            for power_up in self.power_up_sprites.copy():
+                if power_up.rect.top > settings.WINDOW_HEIGHT:
+                    self.power_up_sprites.remove(power_up)
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
@@ -152,6 +164,7 @@ class Game:
             self.block_sprites.draw(surface=self.display_surface)
             self.scoreboard_sprites.draw(surface=self.display_surface)
             self.heart_sprites.draw(surface=self.display_surface)
+            self.power_up_sprites.draw(self.display_surface)
 
             # update window
             pygame.display.update()

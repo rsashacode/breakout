@@ -38,6 +38,14 @@ COLOR_LEGEND = {
 	7: pygame.image.load('./assets/blocks/red.png')
 }
 
+POWER_UP_IMAGES = [
+    pygame.image.load('./assets/other/heart.png'),
+    pygame.image.load('./assets/other/laser.png'),
+    pygame.image.load('./assets/other/size.png'),
+    pygame.image.load('./assets/other/speed.png'),
+]
+
+
 GAP_SIZE = 2
 BLOCK_HEIGHT = WINDOW_HEIGHT / len(BLOCK_MAP) - GAP_SIZE
 BLOCK_WIDTH = GAME_WINDOW_WIDTH / len(BLOCK_MAP[0]) - GAP_SIZE

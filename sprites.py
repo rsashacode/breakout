@@ -82,18 +82,20 @@ class Block(GameSprite):
 		self.health = health
 		image = settings.COLOR_LEGEND[self.health]
 		super().__init__(groups, image, rect)
-		# damage information
 		
-
+		
+		
+	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
 
 	def update(self):
 		self.last_frame_rect = self.rect.copy()
-		if self.health > 0:
-			self.image = settings.COLOR_LEGEND[self.health]
-		else:
+		if self.health <= 0:
 			self.kill()
+			if random.random() < 0.3:
+				power_up = PowerUp(self.rect.centerx, self.rect.bottom)
+				self.groups()[0].add(power_up)
 
 
 class Ball(GameSprite):
@@ -279,3 +281,15 @@ class Scoreboard(GameSprite):
 	def update(self):
 		pass
 
+class PowerUp(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = random.choice(settings.POWER_UP_IMAGES)
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.speed = 400
+
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > settings.GAME_WINDOW_HEIGHT:
+            self.kill()
+        # 这里需要添加逻辑来处理与player的碰撞，如果有碰撞，则调用self.kill()
