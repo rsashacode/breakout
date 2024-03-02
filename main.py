@@ -37,14 +37,14 @@ class Game:
         self.power_up_sprites = pygame.sprite.Group()
 
         # initialise_game
-        self.power_ups: list[list[PowerUp]] = self.power_ups_setup()
-        self.blocks: list[list[Block]] = self.blocks_setup()
         self.hearts: list[Heart] = self.hearts_setup()
-        self.player: Player = self.player_setup()
+        self.player: Player = self.player_setup(self.heart_sprites)
+        self.power_ups: list[list[PowerUp]] = self.power_ups_setup(player=self.player)
+        self.blocks: list[list[Block]] = self.blocks_setup(self.power_ups)
         self.balls: list[Ball] = self.balls_setup(self.player)
         self.scoreboard: Scoreboard = self.scoreboard_setup()
 
-    def player_setup(self) -> Player:
+    def player_setup(self, heart_sprites_group) -> Player:
         player_image = pygame.Surface(size=(settings.PADDLE_WIDTH, settings.PADDLE_HEIGHT))
         player_image.fill('white')
         player_rect = player_image.get_rect(midbottom=(settings.GAME_WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
@@ -52,10 +52,10 @@ class Game:
             groups=[self.all_sprites, self.player_sprites],
             image=player_image,
             rect=player_rect,
-            heart_group=self.heart_sprites
+            heart_group=heart_sprites_group
         )
 
-    def blocks_setup(self) -> list[list[Block]]:
+    def blocks_setup(self, power_ups: list[list[PowerUp]]) -> list[list[Block]]:
         # cycle through all rows and columns of BLOCK_MAP
         blocks = []
         for row_index, row in enumerate(settings.BLOCK_MAP):
@@ -76,7 +76,7 @@ class Game:
                     block_rect = block_image.get_rect(topleft=(x, y))
 
                     # Check if power up exists
-                    power_up = self.power_ups[row_index][col_index]
+                    power_up = power_ups[row_index][col_index]
 
                     block_row.append(
                         Block(
@@ -90,22 +90,29 @@ class Game:
             blocks.append(block_row)
         return blocks
 
-    def power_ups_setup(self) -> list[list[PowerUp]]:
+    def power_ups_setup(self, player: Player) -> list[list[PowerUp]]:
         power_ups = []
         for row_index, row in enumerate(settings.BLOCK_MAP):
             power_ups_row = []
             for col_index, block_present in enumerate(row):
                 if block_present != ' ': # and random.random() < 0.3:
-                    x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
-                    y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
+                    x = (
+                        col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2 +
+                        settings.BLOCK_WIDTH // 2
+                    )
+                    y = (
+                        row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2 +
+                        settings.BLOCK_HEIGHT // 2
+                    )
 
                     power_up_image = pygame.image.load(random.choice(settings.POWER_UP_IMAGES))
                     power_up_rect = power_up_image.get_rect(topleft=(x, y))
 
                     power_up = PowerUp(
-                        groups=[self.all_sprites, self.power_up_sprites],
+                        groups=[self.all_sprites],
                         image=power_up_image,
-                        rect=power_up_rect
+                        rect=power_up_rect,
+                        player=player
                     )
                     power_ups_row.append(power_up)
                 else:
@@ -184,6 +191,11 @@ class Game:
             self.block_sprites.draw(surface=self.display_surface)
             self.scoreboard_sprites.draw(surface=self.display_surface)
             self.heart_sprites.draw(surface=self.display_surface)
+            for powerup_row in self.power_ups:
+                for powerup in powerup_row:
+                    if powerup is not None:
+                        if powerup.visible == 1:
+                            powerup.add(self.power_up_sprites)
             self.power_up_sprites.draw(surface=self.display_surface)
 
             # update window

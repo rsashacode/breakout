@@ -7,7 +7,7 @@ import time
 from pygame.sprite import AbstractGroup
 
 
-class GameSprite(pygame.sprite.DirtySprite):
+class GameSprite(pygame.sprite.Sprite):
 	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
 		super().__init__(groups)
 
@@ -33,7 +33,7 @@ class Heart(GameSprite):
 
 
 class Player(GameSprite):
-	def __init__(self, groups: AbstractGroup, image: pygame.Surface, rect: pygame.Rect, heart_group: [Heart]):
+	def __init__(self, groups: AbstractGroup, image: pygame.Surface, rect: pygame.Rect, heart_group):
 		super().__init__(groups, image, rect)
 		self.direction = pygame.math.Vector2()
 		self.health = settings.MAX_PLAYER_HEALTH
@@ -78,24 +78,18 @@ class Player(GameSprite):
 
 
 class PowerUp(GameSprite):
-	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, player: Player):
 		super().__init__(groups, image, rect)
+		self.player = player
 		self.speed = settings.DEFAULT_POWERUP_SPEED
-		self.dirty = 0
 		self.visible = 0
 
 	def update(self):
-		self.rect.y += self.speed
-		# for power_up in self.power_up_sprites:
-		# 	if pygame.sprite.collide_rect(power_up, self.player):
-		# 		power_up.kill()
-		#
-		# # Check if any power-up has reached the bottom of the screen, and if so, remove it.
-		# for power_up in self.power_up_sprites.copy():
-		# 	if power_up.rect.top > settings.WINDOW_HEIGHT:
-		# 		self.power_up_sprites.remove(power_up)
-		# if self.rect.top > settings.GAME_WINDOW_HEIGHT:
-		# 	self.kill()
+		if self.visible:
+			self.rect.y += self.speed
+			if self.rect.top > settings.GAME_WINDOW_HEIGHT or pygame.sprite.collide_rect(self, self.player):
+				self.visible = 0
+				self.kill()
 
 
 class Block(GameSprite):
@@ -108,9 +102,6 @@ class Block(GameSprite):
 	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
-		self.update_image()
-		if self.health <= 0:
-			self.kill()
 	
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
@@ -118,10 +109,10 @@ class Block(GameSprite):
 
 	def activate_powerup(self):
 		self.power_up.visible = 1
-		self.power_up.dirty = 2
 
 	def update(self):
 		self.last_frame_rect = self.rect.copy()
+		self.update_image()
 		if self.health <= 0:
 			self.kill()
 			if self.power_up is not None:
