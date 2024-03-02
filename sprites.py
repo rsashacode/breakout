@@ -103,10 +103,18 @@ class Block(GameSprite):
 		super().__init__(groups, image, rect)
 		self.health = health
 		self.power_up = power_up
+		self.update_image()
 
 	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
+		self.update_image()
+		if self.health <= 0:
+			self.kill()
+	
+	def update_image(self):
+		if self.health in settings.COLOR_LEGEND:
+			self.image = pygame.image.load(settings.COLOR_LEGEND[self.health])
 
 	def activate_powerup(self):
 		self.power_up.visible = 1

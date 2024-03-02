@@ -13,44 +13,30 @@ DEFAULT_PADDLE_SPEED = 1000
 DEFAULT_BALL_SPEED = 300
 DEFAULT_POWERUP_SPEED = 400
 
-# BLOCK_MAP = [
-# 	'666666666666',
-# 	'444557755444',
-# 	'333333333333',
-# 	'222222222222',
-# 	'111111111111',
-# 	'            ',
-# 	'            ',
-# 	'            ',
-# 	'            ',
-# 	'            ',
-# 	'            ',
-# 	'            ',
-# 	'            ']
-
 BLOCK_MAP = [
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ']
+ 	'666666666666',
+ 	'444557755444',
+ 	'333333333333',
+ 	'222222222222',
+ 	'111111111111',
+ 	'            ',
+ 	'            ',
+ 	'            ',
+ 	'            ',
+ 	'            ',
+ 	'            ',
+ 	'            ',
+ 	'            '
+    ]
 
 COLOR_LEGEND = {
-	1: './assets/blocks/blue.png',
-	2: './assets/blocks/bronce.png',
-	3: './assets/blocks/green.png',
-	4: './assets/blocks/grey.png',
-	5: './assets/blocks/orange.png',
-	6: './assets/blocks/purple.png',
-	7: './assets/blocks/red.png'
+	1: './assets/blocks/1.png',
+	2: './assets/blocks/2.png',
+	3: './assets/blocks/3.png',
+	4: './assets/blocks/4.png',
+	5: './assets/blocks/5.png',
+	6: './assets/blocks/6.png',
+	7: './assets/blocks/7.png'
 }
 
 POWER_UP_IMAGES = [

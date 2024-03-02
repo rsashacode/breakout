@@ -132,7 +132,7 @@ class Game:
         heart_hor_gap = (settings.SCOREBOARD_WIDTH - 20 * 2) // 3
         for i in range(settings.MAX_PLAYER_HEALTH):
             heart_rect = heart_image.get_rect(
-                midtop=(settings.GAME_WINDOW_WIDTH + (i + 1) * heart_hor_gap, settings.GAME_WINDOW_HEIGHT // 10)
+                midtop=(settings.GAME_WINDOW_WIDTH + (i + 1) * heart_hor_gap, settings.GAME_WINDOW_HEIGHT // 7)
             )
             heart = Heart(
                     groups=[self.all_sprites, self.heart_sprites],
@@ -143,7 +143,7 @@ class Game:
         return hearts
 
     def scoreboard_setup(self):
-        scoreboard_image = pygame.image.load('./assets/other/scoreboard.jpg').convert_alpha()
+        scoreboard_image = pygame.image.load('./assets/other/scoreboard.png').convert_alpha()
         scoreboard_image = pygame.transform.scale(scoreboard_image, (settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT))
         scoreboard_rectangle = scoreboard_image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
 
