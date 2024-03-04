@@ -28,17 +28,17 @@ class Game:
         self.bg = create_bg()
 
         # sprites group setup
-        self.all_sprites = pygame.sprite.Group()
-        self.block_sprites = pygame.sprite.Group()
-        self.player_sprites = pygame.sprite.Group()
-        self.ball_sprites = pygame.sprite.Group()
-        self.scoreboard_sprites = pygame.sprite.Group()
-        self.heart_sprites = pygame.sprite.Group()
-        self.power_up_sprites = pygame.sprite.Group()
+        self.all_sprites_group = pygame.sprite.Group()
+        self.block_sprites_group = pygame.sprite.Group()
+        self.player_sprites_group = pygame.sprite.Group()
+        self.ball_sprites_group = pygame.sprite.Group()
+        self.scoreboard_sprites_group = pygame.sprite.Group()
+        self.heart_sprites_group = pygame.sprite.Group()
+        self.power_up_sprites_group = pygame.sprite.Group()
 
         # initialise_game
         self.hearts: list[Heart] = self.hearts_setup()
-        self.player: Player = self.player_setup(self.heart_sprites)
+        self.player: Player = self.player_setup(self.heart_sprites_group)
         self.power_ups: list[list[PowerUp]] = self.power_ups_setup(player=self.player)
         self.blocks: list[list[Block]] = self.blocks_setup(self.power_ups)
         self.balls: list[Ball] = self.balls_setup(self.player)
@@ -49,7 +49,7 @@ class Game:
         player_image.fill('white')
         player_rect = player_image.get_rect(midbottom=(settings.GAME_WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
         return Player(
-            groups=[self.all_sprites, self.player_sprites],
+            sprite_groups=[self.all_sprites_group, self.player_sprites_group],
             image=player_image,
             rect=player_rect,
             heart_group=heart_sprites_group
@@ -80,7 +80,7 @@ class Game:
 
                     block_row.append(
                         Block(
-                            groups=[self.all_sprites, self.block_sprites],
+                            sprite_groups=[self.all_sprites_group, self.block_sprites_group],
                             image=block_image,
                             rect=block_rect,
                             health=health,
@@ -107,12 +107,15 @@ class Game:
 
                     power_up_image = pygame.image.load(random.choice(settings.POWER_UP_IMAGES))
                     power_up_rect = power_up_image.get_rect(topleft=(x, y))
+                    power = random.choice(settings.POWERS)
 
                     power_up = PowerUp(
-                        groups=[self.all_sprites],
+                        sprite_groups=[self.all_sprites_group],   # By default, power ups do not belong to power ups group
                         image=power_up_image,
                         rect=power_up_rect,
-                        player=player
+                        ball_group=self.ball_sprites_group,
+                        player=player,
+                        power='big-paddle'
                     )
                     power_ups_row.append(power_up)
                 else:
@@ -124,11 +127,11 @@ class Game:
         ball_image = pygame.image.load('./assets/other/Ball.png').convert_alpha()
         balls = [
             Ball(
-                groups=[self.all_sprites, self.ball_sprites],
+                sprite_groups=[self.all_sprites_group, self.ball_sprites_group],
                 image=ball_image,
                 rect=ball_image.get_rect(midbottom=player.rect.midtop),
                 player=player,
-                blocks=self.block_sprites
+                blocks_group=self.block_sprites_group
             )
         ]
         return balls
@@ -142,7 +145,7 @@ class Game:
                 midtop=(settings.GAME_WINDOW_WIDTH + (i + 1) * heart_hor_gap, settings.GAME_WINDOW_HEIGHT // 7)
             )
             heart = Heart(
-                    groups=[self.all_sprites, self.heart_sprites],
+                    sprite_groups=[self.all_sprites_group, self.heart_sprites_group],
                     image=heart_image,
                     rect=heart_rect
                 )
@@ -155,7 +158,7 @@ class Game:
         scoreboard_rectangle = scoreboard_image.get_rect(topright=(settings.WINDOW_WIDTH, 0))
 
         return Scoreboard(
-            groups=[self.all_sprites, self.scoreboard_sprites],
+            sprite_groups=[self.all_sprites_group, self.scoreboard_sprites_group],
             image=scoreboard_image,
             rect=scoreboard_rectangle,
         )
@@ -178,25 +181,25 @@ class Game:
 
             # update the game
             self.player.update(delta_time, keys_pressed)
-            self.block_sprites.update()
-            self.ball_sprites.update(delta_time, keys_pressed)
-            self.heart_sprites.update()
-            self.power_up_sprites.update()
+            self.block_sprites_group.update()
+            self.ball_sprites_group.update(delta_time, keys_pressed)
+            self.heart_sprites_group.update()
+            self.power_up_sprites_group.update()
             # self.scoreboard_sprites.update()
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
-            self.player_sprites.draw(surface=self.display_surface)
-            self.ball_sprites.draw(surface=self.display_surface)
-            self.block_sprites.draw(surface=self.display_surface)
-            self.scoreboard_sprites.draw(surface=self.display_surface)
-            self.heart_sprites.draw(surface=self.display_surface)
+            self.player_sprites_group.draw(surface=self.display_surface)
+            self.ball_sprites_group.draw(surface=self.display_surface)
+            self.block_sprites_group.draw(surface=self.display_surface)
+            self.scoreboard_sprites_group.draw(surface=self.display_surface)
+            self.heart_sprites_group.draw(surface=self.display_surface)
             for powerup_row in self.power_ups:
                 for powerup in powerup_row:
                     if powerup is not None:
                         if powerup.visible == 1:
-                            powerup.add(self.power_up_sprites)
-            self.power_up_sprites.draw(surface=self.display_surface)
+                            powerup.add(self.power_up_sprites_group)
+            self.power_up_sprites_group.draw(surface=self.display_surface)
 
             # update window
             pygame.display.update()

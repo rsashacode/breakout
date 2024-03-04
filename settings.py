@@ -11,23 +11,23 @@ PADDLE_HEIGHT = WINDOW_HEIGHT // 40
 
 DEFAULT_PADDLE_SPEED = 1000
 DEFAULT_BALL_SPEED = 300
-DEFAULT_POWERUP_SPEED = 4
+DEFAULT_POWERUP_SPEED = 6
 
 BLOCK_MAP = [
- 	'666666666666',
- 	'444557755444',
- 	'333333333333',
- 	'222222222222',
- 	'111111111111',
- 	'            ',
- 	'            ',
- 	'            ',
- 	'            ',
- 	'            ',
- 	'            ',
- 	'            ',
- 	'            '
-    ]
+	'666666666666',
+	'444557755444',
+	'333333333333',
+	'222222222222',
+	'111111111111',
+	'            ',
+	'            ',
+	'            ',
+	'            ',
+	'            ',
+	'            ',
+	'            ',
+	'            '
+]
 
 COLOR_LEGEND = {
 	1: './assets/blocks/1.png',
@@ -44,6 +44,17 @@ POWER_UP_IMAGES = [
 	'./assets/other/laser.png',
 	'./assets/other/size.png',
 	'./assets/other/speed.png'
+]
+
+POWERS = [
+	'big-ball',
+	'small-ball',
+	'fast-ball',
+	'slow-ball',
+	# 'multiply-balls',
+	'super-ball',
+	'big-paddle',
+	'small-paddle'
 ]
 
 GAP_SIZE = 2
