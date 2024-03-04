@@ -79,18 +79,23 @@ class Player(GameSprite):
 
 
 class PowerUp(GameSprite):
-	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, player: Player):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, player: Player, score):
 		super().__init__(groups, image, rect)
 		self.player = player
 		self.speed = settings.DEFAULT_POWERUP_SPEED
+		self.score = score
 		self.visible = 0
 
 	def update(self):
 		if self.visible:
 			self.rect.y += self.speed
-			if self.rect.top > settings.GAME_WINDOW_HEIGHT or pygame.sprite.collide_rect(self, self.player):
+			if pygame.sprite.collide_rect(self, self.player):
 				self.visible = 0
+				self.score.add_score(100)
 				self.kill()
+			elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
+					self.visible = 0
+					self.kill()
 
 
 class Block(GameSprite):
@@ -148,10 +153,10 @@ class Ball(GameSprite):
 		self.rect.x = round(self.position.x)
 		self.rect.y = round(self.position.y)
 
-	def loose_the_ball(self):
+	def loose_the_ball(self, score_obj):
 		self.active = False
 		self.time_delay_counter = time.time()
-		self.player.loose_health()
+		self.player.loose_health(score_obj)
 
 	def frame_collision(self):
 		# Hit the left side of the game window
@@ -174,7 +179,7 @@ class Ball(GameSprite):
 
 		# Hit the bottom of the game window
 		elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
-			self.loose_the_ball()
+			self.loose_the_ball(self.score)
 
 	def get_overlapping_sprites(self) -> [pygame.sprite.Sprite]:
 		overlap_sprites = pygame.sprite.spritecollide(self, self.blocks, False)
@@ -246,7 +251,7 @@ class Ball(GameSprite):
 				self.rect.bottom = overlapping_rect.top
 		# Horizontal collision and Vertical and horizontal collision (perfectly hit an angle)
 		else:
-			self.loose_the_ball()
+			self.loose_the_ball(self.score)
 
 		hit_point_x = overlapping_rect.centerx
 		paddle_middle = self.player.rect.centerx

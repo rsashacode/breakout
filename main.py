@@ -114,7 +114,8 @@ class Game:
                         groups=[self.all_sprites],
                         image=power_up_image,
                         rect=power_up_rect,
-                        player=player
+                        player=player,
+                        score=self.score
                     )
                     power_ups_row.append(power_up)
                 else:
