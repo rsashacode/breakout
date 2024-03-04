@@ -4,7 +4,7 @@ import time
 import settings
 import random
 
-from sprites import Player, Ball, Scoreboard, Block, Heart, PowerUp
+from sprites import Player, Ball, Scoreboard, Block, Heart, PowerUp, Score
 
 
 def create_bg():
@@ -35,8 +35,10 @@ class Game:
         self.scoreboard_sprites = pygame.sprite.Group()
         self.heart_sprites = pygame.sprite.Group()
         self.power_up_sprites = pygame.sprite.Group()
+        self.score_sprites = pygame.sprite.Group()
 
         # initialise_game
+        self.score = Score(self.all_sprites, self.score_sprites)
         self.hearts: list[Heart] = self.hearts_setup()
         self.player: Player = self.player_setup(self.heart_sprites)
         self.power_ups: list[list[PowerUp]] = self.power_ups_setup(player=self.player)
@@ -128,7 +130,8 @@ class Game:
                 image=ball_image,
                 rect=ball_image.get_rect(midbottom=player.rect.midtop),
                 player=player,
-                blocks=self.block_sprites
+                blocks=self.block_sprites,
+                score=self.score
             )
         ]
         return balls
@@ -183,6 +186,7 @@ class Game:
             self.heart_sprites.update()
             self.power_up_sprites.update()
             # self.scoreboard_sprites.update()
+            self.score_sprites.update()
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
@@ -197,6 +201,7 @@ class Game:
                         if powerup.visible == 1:
                             powerup.add(self.power_up_sprites)
             self.power_up_sprites.draw(surface=self.display_surface)
+            self.score_sprites.draw(surface=self.display_surface)
 
             # update window
             pygame.display.update()

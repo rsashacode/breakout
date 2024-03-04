@@ -51,11 +51,12 @@ class Player(GameSprite):
 	def move_paddle(self, delta_time):
 		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
 
-	def loose_health(self):
+	def loose_health(self, score_obj):
 		if self.health >= 1:
 			self.health -= 1
 			heart_sprites = self.heart_group.sprites()
 			heart_sprites[-1].active = False
+			score_obj.subtract_score(200)
 
 	def get_health(self):
 		if self.health < settings.MAX_PLAYER_HEALTH:
@@ -100,8 +101,14 @@ class Block(GameSprite):
 		self.update_image()
 
 	# damage information
-	def get_damage(self, amount: int):
+	def get_damage(self, amount: int, score_obj):
 		self.health -= amount
+		score_obj.add_score(10)
+		if self.health <= 0:
+			score_obj.add_score(10)
+			self.kill()
+			if self.power_up is not None:
+				self.power_up.visible = 1
 	
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
@@ -120,12 +127,14 @@ class Block(GameSprite):
 
 
 class Ball(GameSprite):
-	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, player: Player, blocks: [Block]):
+	def __init__(self, groups, image: pygame.Surface, rect: pygame.Rect, player: Player, blocks: [Block], score):
 		super().__init__(groups, image, rect)
 
 		# collision objects
 		self.player = player
 		self.blocks = blocks
+		self.score = score
+		
 
 		self.direction = pygame.math.Vector2(x=(random.choice((1, -1)), -1))
 		self.speed = settings.DEFAULT_BALL_SPEED
@@ -266,7 +275,7 @@ class Ball(GameSprite):
 
 				for sprite in colliding_sprites:
 					if getattr(sprite, 'health', None):
-						sprite.get_damage(1)
+						sprite.get_damage(1, self.score)
 
 				self.handle_block_bounce(overlapping_rect=overlap_rect)
 			else:
@@ -301,3 +310,24 @@ class Scoreboard(GameSprite):
 
 	def update(self):
 		pass
+
+
+class Score(pygame.sprite.Sprite):
+    def __init__(self, *groups):
+        super().__init__(*groups)
+        self.score = 0
+        self.font = pygame.font.Font(None, 36)
+        self.color = pygame.Color('white')
+        self.update_text()
+        self.rect = self.image.get_rect(center=(settings.WINDOW_WIDTH - 82, 150))
+
+    def add_score(self, points):
+        self.score += points
+        self.update_text()
+
+    def subtract_score(self, points):
+        self.score -= points
+        self.update_text()
+
+    def update_text(self):
+        self.image = self.font.render(f'Score: {self.score}', True, self.color)
