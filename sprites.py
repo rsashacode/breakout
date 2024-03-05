@@ -11,7 +11,6 @@ class GameSprite(pygame.sprite.Sprite):
 	def __init__(self, sprite_groups: Any, image: pygame.Surface, rect: pygame.Rect):
 		super().__init__(sprite_groups)
 
-		self.sprite_groups = sprite_groups
 		self.image = image
 		self.rect = rect
 		self.position = pygame.math.Vector2(self.rect.topleft)
@@ -72,11 +71,12 @@ class Player(GameSprite):
 	def move_paddle(self, delta_time):
 		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
 
-	def loose_health(self):
+	def loose_health(self, score_obj):
 		if self.health >= 1:
 			self.health -= 1
 			heart_sprites = self.heart_group.sprites()
 			heart_sprites[-1].active = False
+			score_obj.subtract_score(200)
 
 	def get_health(self):
 		if self.health < settings.MAX_PLAYER_HEALTH:
@@ -99,13 +99,32 @@ class Player(GameSprite):
 		self.rect.x = round(self.position.x)
 
 
+class Score(GameSprite):
+	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, font: pygame.font.Font, color: pygame.Color):
+		super().__init__(sprite_groups, image, rect)
+		self.score = 0
+		self.font = font
+		self.color = color
+
+	def add_score(self, points):
+		self.score += points
+
+	def subtract_score(self, points):
+		self.score -= points
+
+	def update(self):
+		self.image = self.font.render(f'Score: {self.score}', True, self.color)
+
+
 class PowerUp(GameSprite):
 	def __init__(
-			self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, ball_group, player: Player, power: str = ''):
+			self, sprite_groups, image: pygame.Surface, rect: pygame.Rect,
+			ball_group, player: Player, score: Score, power: str = ''):
 		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
 		self.player = player
 		self.ball_group = ball_group
 		self.speed = settings.DEFAULT_POWERUP_SPEED
+		self.score = score
 		self.visible = 0
 		self.power = power
 
@@ -135,7 +154,8 @@ class PowerUp(GameSprite):
 					image=ball.image,
 					rect=ball.rect,
 					player=ball.player,
-					blocks_group=ball.blocks_group
+					blocks_group=ball.blocks_group,
+					score=self.score
 				)
 				new_ball_2 = Ball(
 					sprite_groups=ball.sprite_groups,
@@ -165,12 +185,14 @@ class PowerUp(GameSprite):
 
 	def update(self):
 		if self.visible:
+			self.rect.y += self.speed
 			if self.rect.top > settings.GAME_WINDOW_HEIGHT:
 				self.visible = 0
 				self.kill()
 			if pygame.sprite.collide_rect(self, self.player):
 				self.activate()
 				self.visible = 0
+				self.score.add_score(100)
 				self.kill()
 			self.rect.y += self.speed
 
@@ -183,8 +205,14 @@ class Block(GameSprite):
 		self.update_image()
 
 	# damage information
-	def get_damage(self, amount: int):
+	def get_damage(self, amount: int, score_obj):
 		self.health -= amount
+		score_obj.add_score(10)
+		if self.health <= 0:
+			score_obj.add_score(10)
+			self.kill()
+			if self.power_up is not None:
+				self.power_up.visible = 1
 
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
@@ -203,12 +231,13 @@ class Block(GameSprite):
 
 
 class Ball(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, player: Player, blocks_group):
+	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, player: Player, blocks_group, score):
 		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
 
 		# collision objects
 		self.player = player
 		self.blocks_group = blocks_group
+		self.score = score
 
 		self.direction = pygame.math.Vector2((random.choice((1, -1)), -1))
 		self.speed = settings.DEFAULT_BALL_SPEED
@@ -271,11 +300,11 @@ class Ball(GameSprite):
 		self.rect.x = round(self.position.x)
 		self.rect.y = round(self.position.y)
 
-	def loose_the_ball(self):
+	def loose_the_ball(self, score_obj):
 		self.active = False
 		self.time_delay_counter = time.time()
 		if len(self.sprite_groups[1].sprites()) == 1:
-			self.player.loose_health()
+			self.player.loose_health(score_obj)
 
 	def frame_collision(self):
 		# Hit the left side of the game window
@@ -298,7 +327,7 @@ class Ball(GameSprite):
 
 		# Hit the bottom of the game window
 		elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
-			self.loose_the_ball()
+			self.loose_the_ball(self.score)
 
 	def get_overlapping_sprites(self) -> [pygame.sprite.Sprite]:
 		overlap_sprites = pygame.sprite.spritecollide(self, self.blocks_group, False)
@@ -370,7 +399,7 @@ class Ball(GameSprite):
 				self.rect.bottom = overlapping_rect.top
 		# Horizontal collision and Vertical and horizontal collision (perfectly hit an angle)
 		else:
-			self.loose_the_ball()
+			self.loose_the_ball(self.score)
 
 		hit_point_x = overlapping_rect.centerx
 		paddle_middle = self.player.rect.centerx
@@ -400,7 +429,7 @@ class Ball(GameSprite):
 				for sprite in colliding_sprites:
 					if getattr(sprite, 'health', None):
 						for _ in range(self.strength):
-							sprite.get_damage(1)
+							sprite.get_damage(1, self.score)
 
 				self.handle_block_bounce(overlapping_rect=overlap_rect)
 			else:

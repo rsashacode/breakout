@@ -4,7 +4,7 @@ import time
 import settings
 import random
 
-from sprites import Player, Ball, Scoreboard, Block, Heart, PowerUp
+from sprites import Player, Ball, Scoreboard, Block, Heart, PowerUp, Score
 
 
 def create_bg():
@@ -35,8 +35,10 @@ class Game:
         self.scoreboard_sprites_group = pygame.sprite.Group()
         self.heart_sprites_group = pygame.sprite.Group()
         self.power_up_sprites_group = pygame.sprite.Group()
+        self.score_sprites_group = pygame.sprite.Group()
 
         # initialise_game
+        self.score: Score = self.score_setup()
         self.hearts: list[Heart] = self.hearts_setup()
         self.player: Player = self.player_setup(self.heart_sprites_group)
         self.power_ups: list[list[PowerUp]] = self.power_ups_setup(player=self.player)
@@ -107,15 +109,15 @@ class Game:
 
                     power_up_image = pygame.image.load(random.choice(settings.POWER_UP_IMAGES))
                     power_up_rect = power_up_image.get_rect(topleft=(x, y))
-                    power = random.choice(settings.POWERS)
 
                     power_up = PowerUp(
                         sprite_groups=[self.all_sprites_group],   # By default, power ups do not belong to power ups group
                         image=power_up_image,
                         rect=power_up_rect,
                         ball_group=self.ball_sprites_group,
+                        power='big-paddle',
                         player=player,
-                        power='big-paddle'
+                        score=self.score
                     )
                     power_ups_row.append(power_up)
                 else:
@@ -131,7 +133,8 @@ class Game:
                 image=ball_image,
                 rect=ball_image.get_rect(midbottom=player.rect.midtop),
                 player=player,
-                blocks_group=self.block_sprites_group
+                blocks_group=self.block_sprites_group,
+                score=self.score
             )
         ]
         return balls
@@ -163,6 +166,19 @@ class Game:
             rect=scoreboard_rectangle,
         )
 
+    def score_setup(self):
+        score_color = pygame.Color('white')
+        score_font = pygame.font.Font(None, 36)
+        score_image = score_font.render(f'Score: 0', True, score_color)
+        score_rect = score_image.get_rect(center=(settings.WINDOW_WIDTH - 82, 150))
+        return Score(
+            sprite_groups=[self.all_sprites_group, self.score_sprites_group],
+            image=score_image,
+            rect=score_rect,
+            font=score_font,
+            color=score_color
+        )
+
     def run(self):
         last_time = time.time()
 
@@ -186,6 +202,7 @@ class Game:
             self.heart_sprites_group.update()
             self.power_up_sprites_group.update()
             # self.scoreboard_sprites.update()
+            self.score_sprites_group.update()
 
             # draw the frame
             self.display_surface.blit(source=self.bg, dest=(0, 0))
@@ -200,6 +217,7 @@ class Game:
                         if powerup.visible == 1:
                             powerup.add(self.power_up_sprites_group)
             self.power_up_sprites_group.draw(surface=self.display_surface)
+            self.score_sprites_group.draw(surface=self.display_surface)
 
             # update window
             pygame.display.update()
