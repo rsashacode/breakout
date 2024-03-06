@@ -41,6 +41,8 @@ class PowerUpManager:
 			'small-paddle': self.activate_small_paddle
 		}
 
+		self.active_powerups = []
+
 		self.ball_size_timer = PowerUpTimer()
 		self.ball_speed_timer = PowerUpTimer()
 		self.ball_strength_timer = PowerUpTimer()
@@ -49,6 +51,8 @@ class PowerUpManager:
 	def activate_powerup(self, power: str):
 		try:
 			self.trigger_methods[power]()
+			if power not in ['add-life', 'multiply-balls']:
+				self.active_powerups.append(power)
 		except KeyError as e:
 			print('Unknown power! Skip activating', str(e))
 
@@ -153,21 +157,32 @@ class PowerUpManager:
 		print('Deactivating paddle size powerup')
 		for player in self.sprite_manager.player_sprites_group.sprites():
 			player.restore_size()
+		for power in ['big-paddle', 'small-paddle']:
+			if power in self.active_powerups:
+				self.active_powerups.remove(power)
 
 	def deactivate_ball_size(self):
 		print('Deactivating ball size powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_size()
+		for power in ['big-ball', 'small-ball']:
+			if power in self.active_powerups:
+				self.active_powerups.remove(power)
 
 	def deactivate_ball_speed(self):
 		print('Deactivating ball speed powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_speed()
+		for power in ['fast-ball', 'slow-ball']:
+			if power in self.active_powerups:
+				self.active_powerups.remove(power)
 
 	def deactivate_ball_strength(self):
 		print('Deactivating ball strength powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_strength()
+		if 'super-ball' in self.active_powerups:
+			self.active_powerups.remove('super-ball')
 
 	def update(self):
 		if self.paddle_size_timer.active:
