@@ -3,6 +3,7 @@ import settings
 import random
 import math
 
+from powerup_manager import PowerUpManager
 from sprites import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard
 
 
@@ -29,6 +30,7 @@ class SpriteManager:
 		self.balls = []
 		self.power_ups = []
 
+		self.powerup_manager = PowerUpManager(self)
 		self.heart_horizontal_gap = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
 
 	def create_scoreboard(self):
@@ -51,7 +53,7 @@ class SpriteManager:
 		score_font = pygame.font.Font(None, size=36)
 		score_image = score_font.render(f'Score: 0', True, score_color)
 		score_rect = score_image.get_rect(
-			center=(settings.WINDOW_WIDTH - settings.SCOREBOARD_WIDTH // 2, settings.WINDOW_HEIGHT // 4.5))
+			center=(settings.WINDOW_WIDTH - settings.SCOREBOARD_WIDTH // 2, settings.WINDOW_HEIGHT // 4))
 		self.score = Score(
 			self,
 			sprite_groups=[self.all_sprites_group, self.score_sprites_group],
@@ -63,6 +65,10 @@ class SpriteManager:
 
 	def create_heart(self, midtop: tuple):
 		heart_image = pygame.image.load('./assets/other/heart_s.png').convert_alpha()
+		heart_image = pygame.transform.scale(
+			surface=heart_image,
+			size=(settings.HEART_WIDTH, settings.HEART_HEIGHT)
+		)
 		heart_rect = heart_image.get_rect(midtop=midtop)
 		heart = Heart(
 			self,
@@ -102,7 +108,8 @@ class SpriteManager:
 			self,
 			ball_image: [None, pygame.Surface] = None,
 			midbottom: [None, bool] = None,
-			angle_radians=math.pi / 4,
+			angle_radians: [None, float] = math.pi / 4,
+			speed: [None, int] = settings.DEFAULT_BALL_SPEED,
 			**kwargs_to_ball
 	):
 		if not ball_image:
@@ -115,6 +122,7 @@ class SpriteManager:
 			sprite_groups=[self.all_sprites_group, self.ball_sprites_group],
 			image=ball_image,
 			rect=ball_rect,
+			speed=speed
 		)
 		new_ball.set_direction_from_angle(angle_radians)
 
@@ -153,6 +161,7 @@ class SpriteManager:
 			sprite_groups=[self.all_sprites_group, self.power_up_sprites_group],
 			image=power_up_image,
 			rect=power_up_rect,
+			powerup_manager=self.powerup_manager,
 			power=power
 		)
 		self.power_ups.append(power_up)
@@ -169,6 +178,7 @@ class SpriteManager:
 
 	def update(self, delta_time: float, keys_pressed):
 		# update the game
+		self.powerup_manager.update()
 		self.player.update(delta_time, keys_pressed)
 		self.block_sprites_group.update()
 		self.ball_sprites_group.update(delta_time, keys_pressed)

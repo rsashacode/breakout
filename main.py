@@ -1,8 +1,6 @@
 import pygame
 import settings
-import time
 import sys
-import math
 
 from sprite_manager import SpriteManager
 

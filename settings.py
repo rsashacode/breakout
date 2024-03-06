@@ -45,6 +45,9 @@ GAME_WINDOW_HEIGHT = WINDOW_HEIGHT
 PADDLE_WIDTH = GAME_WINDOW_WIDTH // 5
 PADDLE_HEIGHT = WINDOW_HEIGHT // 40
 
+HEART_WIDTH = WINDOW_WIDTH // 30
+HEART_HEIGHT = WINDOW_HEIGHT // 20
+
 FPS = 60
 
 # Speeds of objects
@@ -90,6 +93,7 @@ POWER_UP_IMAGES = [
 	'./assets/other/speed.png'
 ]
 
+# Powers tuple(name, probability)
 POWERS = [
 	('add-life', 0.1),
 	('big-ball', 0.3),
@@ -101,6 +105,10 @@ POWERS = [
 	('big-paddle', 0.2),
 	('small-paddle', 0.2)
 ]
+BALL_SPEED_DURATION = 5
+BALL_SIZE_DURATION = 5
+BALL_STRENGTH_DURATION = 5
+PADDLE_SIZE_DURATION = 5
 
 GAP_SIZE = 2
 BLOCK_HEIGHT = WINDOW_HEIGHT / len(BLOCK_MAP) - GAP_SIZE

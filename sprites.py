@@ -1,9 +1,12 @@
+import copy
+
 import pygame
 import settings
 import random
 import math
 import time
 
+from powerup_manager import PowerUpManager
 from typing import Any
 
 
@@ -21,10 +24,54 @@ class GameSprite(pygame.sprite.Sprite):
 		self.sprite_groups = sprite_groups
 		self.image = image
 		self.rect = rect
+
 		self.position = pygame.math.Vector2(self.rect.topleft)
+		self.direction = pygame.math.Vector2((0, 0))
+		self.speed = 0
+
+		self.original_image = self.image.copy()
+		self.original_width = self.rect.width
+		self.original_height = self.rect.height
 
 	def update(self, *args, **kwargs):
-		raise NotImplemented('Sprite must implement "update" method')
+		raise NotImplemented('Sprite class must implement "update" method')
+
+	def movement(self, delta_time):
+		self.position.x += self.direction.x * self.speed * delta_time
+		self.position.y += self.direction.y * self.speed * delta_time
+		self.rect.x = round(self.position.x)
+		self.rect.y = round(self.position.y)
+
+	def update_position_from_rect(self):
+		self.position.x = self.rect.x
+		self.position.y = self.rect.y
+
+	def change_size(self, new_width: int, new_height: int):
+		rect_center = self.rect.center
+		self.image = pygame.transform.scale(self.image, (new_width, new_height))
+		self.rect = self.image.get_rect(center=rect_center)
+		self.rect.height = new_height
+		self.update_position_from_rect()
+
+	def change_image(self, new_image: pygame.Surface, new_width: int, new_height: int):
+		rect_center = self.rect.center
+		self.image = pygame.transform.scale(
+			new_image, (new_width, new_height)
+		)
+		self.rect = self.image.get_rect(center=rect_center)
+		self.update_position_from_rect()
+
+	def restore_size(self):
+		rect_center = self.rect.center
+		self.image = pygame.transform.scale(self.image, (self.original_width, self.original_height))
+		self.rect = self.image.get_rect(center=rect_center)
+		self.update_position_from_rect()
+
+	def restore_image(self):
+		rect_center = self.rect.center
+		self.image = copy.deepcopy(self.original_image)
+		self.rect = self.image.get_rect(center=rect_center)
+		self.update_position_from_rect()
 
 
 class Heart(GameSprite):
@@ -52,26 +99,6 @@ class Player(GameSprite):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.direction = pygame.math.Vector2()
 		self.health = settings.MAX_PLAYER_HEALTH
-
-		# powerups
-		self.big_paddle = False
-		self.small_paddle = False
-
-	def activate_big_paddle(self):
-		if not self.big_paddle:
-			new_paddle_width = int(settings.PADDLE_WIDTH * 2)
-			self.image = pygame.Surface(size=(new_paddle_width, settings.PADDLE_HEIGHT))
-			self.image.fill('white')
-			self.rect = self.image.get_rect(midbottom=(self.rect.midbottom[0], self.rect.midbottom[1]))
-			self.big_paddle = True
-
-	def activate_small_paddle(self):
-		if not self.small_paddle:
-			new_paddle_width = int(settings.PADDLE_WIDTH * 0.5)
-			self.image = pygame.Surface(size=(new_paddle_width, settings.PADDLE_HEIGHT))
-			self.image.fill('white')
-			self.rect = self.image.get_rect(midbottom=(self.rect.midbottom[0], self.rect.midbottom[1]))
-			self.small_paddle = True
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -147,6 +174,7 @@ class PowerUp(GameSprite):
 			sprite_groups,
 			image: pygame.Surface,
 			rect: pygame.Rect,
+			powerup_manager: PowerUpManager,
 			power: str = ''
 	):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
@@ -154,99 +182,10 @@ class PowerUp(GameSprite):
 		self.direction = pygame.math.Vector2((0, 1))
 		self.speed = settings.DEFAULT_POWERUP_SPEED
 		self.power = power
-
-		self.trigger_methods = {
-			'add-life': self.trigger_add_life,
-			'big-ball': self.trigger_big_ball,
-			'small-ball': self.trigger_small_ball,
-			'fast-ball': self.trigger_fast_ball,
-			'slow-ball': self.trigger_slow_ball,
-			'multiply-balls': self.trigger_multiple_balls,
-			'super-ball': self.trigger_super_ball,
-			'big-paddle': self.trigger_big_paddle,
-			'small-paddle': self.trigger_small_paddle
-		}
-
-	def movement(self, delta_time):
-		self.position.x += self.direction.x * self.speed * delta_time
-		self.position.y += self.direction.y * self.speed * delta_time
-		self.rect.x = round(self.position.x)
-		self.rect.y = round(self.position.y)
-
-	def trigger_add_life(self):
-		print('activating add-life')
-		self.sprite_manager.player_sprites_group.sprites()[0].add_health()
-
-	def trigger_big_ball(self):
-		print('activating big-ball')
-		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.activate_big_ball()
-
-	def trigger_small_ball(self):
-		print('activating small-ball')
-		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.activate_small_ball()
-
-	def trigger_fast_ball(self):
-		print('activating fast-ball')
-		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.activate_fast_ball()
-
-	def trigger_slow_ball(self):
-		print('activating slow-ball')
-		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.activate_slow_ball()
-
-	def trigger_multiple_balls(self):
-		print('activating multiple balls')
-		balls_in_game = self.sprite_manager.ball_sprites_group.sprites()
-		for ball in balls_in_game:
-			original_angle = ball.get_angle_of_direction()
-			left_angle = original_angle + math.radians(15)
-			right_angle = original_angle - math.radians(15)
-
-			kwargs = {
-				'speed': ball.speed,
-				'strength': ball.strength,
-				'active': True,
-				'big_ball': False,
-				'small_ball': False,
-				'fast_ball': False,
-				'slow_ball': False,
-				'super_ball': False,
-			}
-
-			self.sprite_manager.create_ball(
-				ball_image=ball.image,
-				midbottom=ball.rect.midbottom,
-				angle_radians=left_angle,
-				**kwargs
-			)
-			self.sprite_manager.create_ball(
-				ball_image=ball.image,
-				midbottom=ball.rect.midbottom,
-				angle_radians=right_angle,
-				**kwargs
-			)
-
-	def trigger_super_ball(self):
-		print('Activating super-ball')
-		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.activate_super_ball()
-
-	def trigger_big_paddle(self):
-		print('Activating big-paddle')
-		self.sprite_manager.player_sprites_group.sprites()[0].activate_big_paddle()
-
-	def trigger_small_paddle(self):
-		print('Activating small paddle')
-		self.sprite_manager.player_sprites_group.sprites()[0].activate_small_paddle()
+		self.powerup_manager = powerup_manager
 
 	def activate(self):
-		try:
-			self.trigger_methods[self.power]()
-		except KeyError as err:
-			print(err, "Unknown power: " + self.power)
+		self.powerup_manager.activate_powerup(self.power)
 
 	def update(self, delta_time):
 		if self.rect.top > settings.GAME_WINDOW_HEIGHT:
@@ -294,57 +233,20 @@ class Ball(GameSprite):
 			sprite_groups,
 			image: pygame.Surface,
 			rect: pygame.Rect,
+			speed: int
 	):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
 		self.direction = pygame.math.Vector2((random.choice((1, -1)), -1))
-		self.speed = settings.DEFAULT_BALL_SPEED
+
+		self.speed = speed
+		self.original_speed = speed
+
 		self.strength = 1
+		self.original_strength = 1
 
 		self.time_delay_counter = 0
 		self.active = False
-
-		# powerups
-		self.big_ball = False
-		self.small_ball = False
-		self.fast_ball = False
-		self.slow_ball = False
-		self.super_ball = False
-
-	def activate_big_ball(self):
-		if not self.big_ball:
-			new_width = int(self.rect.width * 2)
-			new_height = int(self.rect.width * 2)
-			self.image = pygame.transform.scale(self.image, (new_width, new_height))
-			self.rect.width = new_width
-			self.rect.height = new_height
-
-			self.big_ball = True
-
-	def activate_small_ball(self):
-		if not self.small_ball:
-			new_width = int(self.rect.width * 0.5)
-			new_height = int(self.rect.width * 0.5)
-			self.image = pygame.transform.scale(self.image, (new_width, new_height))
-			self.rect.width = new_width
-			self.rect.height = new_height
-
-			self.small_ball = True
-
-	def activate_fast_ball(self):
-		if not self.fast_ball:
-			self.speed = int(self.speed * 2)
-			self.fast_ball = True
-
-	def activate_slow_ball(self):
-		if not self.slow_ball:
-			self.speed = int(self.speed * 0.5)
-			self.slow_ball = True
-
-	def activate_super_ball(self):
-		if not self.super_ball:
-			self.strength = 2
-			self.super_ball = True
 
 	def get_angle_of_direction(self):
 		return math.atan2(self.direction[1], self.direction[0])
@@ -352,11 +254,17 @@ class Ball(GameSprite):
 	def set_direction_from_angle(self, angle):
 		self.direction = pygame.math.Vector2((math.cos(angle), math.sin(angle)))
 
-	def movement(self, delta_time):
-		self.position.x += self.direction.x * self.speed * delta_time
-		self.position.y += self.direction.y * self.speed * delta_time
-		self.rect.x = round(self.position.x)
-		self.rect.y = round(self.position.y)
+	def change_speed(self, new_speed: int):
+		self.speed = new_speed
+
+	def restore_speed(self):
+		self.speed = self.original_speed
+
+	def change_strength(self, new_strength: int):
+		self.strength = new_strength
+
+	def restore_strength(self):
+		self.strength = self.original_strength
 
 	def loose_ball(self):
 		self.time_delay_counter = time.time()
