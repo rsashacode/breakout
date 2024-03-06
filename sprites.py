@@ -336,3 +336,21 @@ class Score(pygame.sprite.Sprite):
 
     def update_text(self):
         self.image = self.font.render(f'Score: {self.score}', True, self.color)
+
+class Congratulations(GameSprite):
+    def __init__(self, groups, image_path, display_surface):
+        # Load the image and get its rect
+        image = pygame.image.load(image_path)
+        rect = image.get_rect(center=(settings.WINDOW_WIDTH / 2, settings.WINDOW_HEIGHT / 2))
+
+        super().__init__(groups, image, rect)
+        self.display_surface = display_surface
+        self.font = pygame.font.Font(None, 36)  # Adjust as needed
+        self.text = 'Press ENTER to next level'
+        self.text_surface = self.font.render(self.text, True, (255, 255, 255))
+        self.text_rect = self.text_surface.get_rect(center=(settings.WINDOW_WIDTH / 2, self.rect.bottom + 30))
+
+    def draw(self):
+        # Draw the image and text
+        self.display_surface.blit(self.image, self.rect)
+        self.display_surface.blit(self.text_surface, self.text_rect)

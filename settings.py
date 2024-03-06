@@ -14,10 +14,10 @@ DEFAULT_BALL_SPEED = 300
 DEFAULT_POWERUP_SPEED = 4
 
 BLOCK_MAP = [
- 	'666666666666',
- 	'444557755444',
- 	'333333333333',
- 	'222222222222',
+ 	'111111111111',
+ 	'111111111111',
+ 	'111111111111',
+ 	'111111111111',
  	'111111111111',
  	'            ',
  	'            ',
@@ -41,7 +41,7 @@ COLOR_LEGEND = {
 
 POWER_UP_IMAGES = [
 	'./assets/other/heart.png',
-	'./assets/other/laser.png',
+	'./assets/other/triple.png',
 	'./assets/other/size.png',
 	'./assets/other/speed.png'
 ]
