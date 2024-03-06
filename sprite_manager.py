@@ -194,3 +194,5 @@ class SpriteManager:
 		self.heart_sprites_group.draw(surface=display_surface)
 		self.power_up_sprites_group.draw(surface=display_surface)
 		self.score_sprites_group.draw(surface=display_surface)
+
+

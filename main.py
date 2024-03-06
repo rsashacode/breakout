@@ -88,6 +88,7 @@ class Game:
         pygame.init()
         self.display_surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
         pygame.display.set_caption('Breakout Game')
+        self.level_completed = False
 
         # background
         self.bg = create_bg()
@@ -98,15 +99,25 @@ class Game:
 
     def run(self):
         clock = pygame.time.Clock()
+        # Load the congratulations image (no scaling to keep original size)
+        congratulations_image = pygame.image.load('./assets/other/congratulations.png').convert_alpha()
+        image_rect = congratulations_image.get_rect(center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2))
+
+        font = pygame.font.Font(None, 36)  # Adjust font size as needed
+        text_surface = font.render('Press ENTER to next level', True, (255, 255, 255))
+        # Adjust the text position to be below the image
+        text_rect = text_surface.get_rect(center=(settings.WINDOW_WIDTH // 2, image_rect.bottom + 20))
+
         while True:
             delta_time = clock.tick_busy_loop(settings.FPS) / 1000
-            fps = clock.get_fps()
-
-            # Event handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if self.level_completed and event.key == pygame.K_RETURN:
+                        print("Ready for next level!")  # Placeholder for next level logic
+                        pass  # Replace with actual code to load the next level
 
             keys_pressed = pygame.key.get_pressed()
             self.sprite_manager.update(delta_time, keys_pressed)
@@ -114,7 +125,17 @@ class Game:
             self.display_surface.blit(source=self.bg, dest=(0, 0))
             self.sprite_manager.draw_all(self.display_surface)
 
+            # Check if all blocks are cleared and level is completed
+            if not self.sprite_manager.block_sprites_group.sprites() and not self.level_completed:
+                self.level_completed = True
+
+            if self.level_completed:
+                self.display_surface.blit(congratulations_image, image_rect)
+                self.display_surface.blit(text_surface, text_rect)
+
             pygame.display.update()
+
+
 
 
 if __name__ == '__main__':
