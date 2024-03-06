@@ -89,6 +89,7 @@ class Game:
         self.display_surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
         pygame.display.set_caption('Breakout Game')
         self.level_completed = False
+        self.current_level = 1
 
         # background
         self.bg = create_bg()
@@ -115,9 +116,10 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    if self.level_completed and event.key == pygame.K_RETURN:
-                        print("Ready for next level!")  # Placeholder for next level logic
-                        pass  # Replace with actual code to load the next level
+                    if self.level_completed and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        self.current_level += 1
+                        self.sprite_manager.init_level(self.current_level)
+                        self.level_completed = False
 
             keys_pressed = pygame.key.get_pressed()
             self.sprite_manager.update(delta_time, keys_pressed)

@@ -78,7 +78,8 @@ class SpriteManager:
 		)
 		self.hearts.append(heart)
 
-	def create_block(self, health, x, y):
+	def create_block(self, health, x, y, level):
+		health = level
 		block_image = pygame.transform.scale(
 			surface=pygame.image.load(settings.COLOR_LEGEND[health]),
 			size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT)
@@ -143,12 +144,11 @@ class SpriteManager:
 			self.create_heart(midtop=heart_midtop)
 
 		for row_index, row in enumerate(settings.BLOCK_MAP):
-			for col_index, health in enumerate(row):
-				if health != ' ':
-					health = int(health)
+			for col_index, char in enumerate(row):
+				if char != ' ':
 					x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
 					y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
-					self.create_block(health, x, y)
+					self.create_block(x, y, level)
 
 		self.create_player()
 		self.create_ball()
