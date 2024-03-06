@@ -13,6 +13,73 @@ def create_bg():
     scaled_bg = pygame.transform.scale(bg_original, (scaled_width, scaled_height))
     return scaled_bg
 
+class Menu:
+    def __init__(self):
+        pygame.init()
+        self.display_surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
+        pygame.display.set_caption('Breakout Game Menu')
+        
+        # Load and scale the background image
+        self.bg_image = pygame.image.load('./assets/background/menu.png').convert()
+        self.bg_image = pygame.transform.scale(self.bg_image, (settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
+        
+        # Setup font for text rendering
+        self.font = pygame.font.Font('./assets/other/BAUHS93.ttf', 40)  # Use pygame's default font
+        self.title_text = 'Breakout Game'
+        self.options = ['Normal', 'Difficult']
+        self.selected_option = 0  # Index of the currently selected option
+
+        # Load and play background music
+        pygame.mixer.music.load('./assets/music/menu.mp3')
+        pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+
+    def render_text(self, text, position, selected=False):
+        color = (255, 0, 0) if selected else (255, 255, 255)  # Red for selected, white otherwise
+        text_surface = self.font.render(text, True, color)
+        text_rect = text_surface.get_rect(center=position)
+        self.display_surface.blit(text_surface, text_rect)
+    
+    def navigate(self, key):
+        if key == pygame.K_UP and self.selected_option > 0:
+            self.selected_option -= 1
+        elif key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
+            self.selected_option += 1
+        elif key == pygame.K_RETURN:
+            if self.selected_option == 0:
+                pygame.mixer.music.stop()
+                # Start the game
+                game = Game()
+                game.run()
+            elif self.selected_option == 1:
+                # Difficult mode is not yet implemented
+                pass
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    self.navigate(event.key)
+
+            # Render the background and text
+            self.display_surface.blit(self.bg_image, (0, 0))
+
+            # Render the title
+            self.render_text(self.title_text, (settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 4), False)
+
+            # Render the menu options
+            for index, option in enumerate(self.options):
+                position = (settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2 + index * 50)
+                self.render_text(option, position, selected=index == self.selected_option)
+
+            pygame.display.update()
+
+        pygame.quit()
+        sys.exit()
+    
+
 
 class Game:
     def __init__(self):
@@ -51,5 +118,5 @@ class Game:
 
 
 if __name__ == '__main__':
-    game = Game()
-    game.run()
+    menu = Menu()
+    menu.run()
