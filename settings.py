@@ -49,7 +49,7 @@ FPS = 60
 
 # Speeds of objects
 PADDLE_SPEED_PER_PIXEL = 0.001
-BALL_SPEED_PER_PIXEL = 0.0002
+BALL_SPEED_PER_PIXEL = 0.0004
 POWERUP_SPEED_PER_PIXEL = 0.0005
 
 DEFAULT_PADDLE_SPEED = PADDLE_SPEED_PER_PIXEL * NUM_PIXELS
@@ -91,16 +91,15 @@ POWER_UP_IMAGES = [
 ]
 
 POWERS = [
-	('multiply-balls', 1),
-	# ('add-life', 0.005),
-	# ('big-ball', 0.05),
-	# ('small-ball', 0.05),
-	# ('fast-ball', 0.03),
-	# ('slow-ball', 0.03),
-	# ('multiply-balls', 0.05),
-	# ('super-ball', 0.05),
-	# ('big-paddle', 0.05),
-	# ('small-paddle', 0.05)
+	('add-life', 0.1),
+	('big-ball', 0.3),
+	('small-ball', 0.3),
+	('fast-ball', 0.25),
+	('slow-ball', 0.25),
+	('multiply-balls', 0.1),
+	('super-ball', 0.2),
+	('big-paddle', 0.2),
+	('small-paddle', 0.2)
 ]
 
 GAP_SIZE = 2
