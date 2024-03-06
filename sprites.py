@@ -8,38 +8,52 @@ from typing import Any
 
 
 class GameSprite(pygame.sprite.Sprite):
-	def __init__(self, sprite_groups: Any, image: pygame.Surface, rect: pygame.Rect):
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups: Any,
+			image: pygame.Surface,
+			rect: pygame.Rect
+	):
 		super().__init__(sprite_groups)
 
+		self.sprite_manager = sprite_manager
+		self.sprite_groups = sprite_groups
 		self.image = image
 		self.rect = rect
 		self.position = pygame.math.Vector2(self.rect.topleft)
-
-		self.last_frame_rect = self.rect.copy()
-		self.last_frame_position = self.position.copy()
 
 	def update(self, *args, **kwargs):
 		raise NotImplemented('Sprite must implement "update" method')
 
 
 class Heart(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
-		self.active = True
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
 	def update(self):
-		if not self.active:
-			self.kill()
+		pass
 
 
 class Player(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, heart_group):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect,
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.direction = pygame.math.Vector2()
 		self.health = settings.MAX_PLAYER_HEALTH
-		self.heart_group = heart_group
 
-		#powerups
+		# powerups
 		self.big_paddle = False
 		self.small_paddle = False
 
@@ -71,22 +85,24 @@ class Player(GameSprite):
 	def move_paddle(self, delta_time):
 		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
 
-	def loose_health(self, score_obj):
+	def loose_health(self):
 		if self.health >= 1:
 			self.health -= 1
-			heart_sprites = self.heart_group.sprites()
-			heart_sprites[-1].active = False
-			score_obj.subtract_score(200)
+			heart_sprites = self.sprite_manager.heart_sprites_group.sprites()
+			heart_sprites[-1].kill()
+			self.sprite_manager.score_sprites_group.sprites()[0].subtract_score(200)
 
-	def get_health(self):
+	def add_health(self):
 		if self.health < settings.MAX_PLAYER_HEALTH:
 			self.health += 1
 
-	# ToDo Initialise new Heart Object
+			heart_midtop = (
+				settings.GAME_WINDOW_WIDTH + self.health * self.sprite_manager.heart_horizontal_gap,
+				settings.GAME_WINDOW_HEIGHT // 7
+			)
+			self.sprite_manager.create_heart(midtop=heart_midtop)
 
 	def update(self, delta_time, keys_pressed: pygame.key.ScancodeWrapper):
-		self.last_frame_rect = self.rect.copy()
-
 		if keys_pressed[pygame.K_RIGHT]:
 			self.direction.x = 1
 		elif keys_pressed[pygame.K_LEFT]:
@@ -100,8 +116,16 @@ class Player(GameSprite):
 
 
 class Score(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, font: pygame.font.Font, color: pygame.Color):
-		super().__init__(sprite_groups, image, rect)
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect,
+			font: pygame.font.Font,
+			color: pygame.Color
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.score = 0
 		self.font = font
 		self.color = color
@@ -118,126 +142,160 @@ class Score(GameSprite):
 
 class PowerUp(GameSprite):
 	def __init__(
-			self, sprite_groups, image: pygame.Surface, rect: pygame.Rect,
-			ball_group, player: Player, score: Score, power: str = ''):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
-		self.player = player
-		self.ball_group = ball_group
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect,
+			power: str = ''
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
+
+		self.direction = pygame.math.Vector2((0, 1))
 		self.speed = settings.DEFAULT_POWERUP_SPEED
-		self.score = score
-		self.visible = 0
 		self.power = power
 
+		self.trigger_methods = {
+			'add-life': self.trigger_add_life,
+			'big-ball': self.trigger_big_ball,
+			'small-ball': self.trigger_small_ball,
+			'fast-ball': self.trigger_fast_ball,
+			'slow-ball': self.trigger_slow_ball,
+			'multiply-balls': self.trigger_multiple_balls,
+			'super-ball': self.trigger_super_ball,
+			'big-paddle': self.trigger_big_paddle,
+			'small-paddle': self.trigger_small_paddle
+		}
+
+	def movement(self, delta_time):
+		self.position.x += self.direction.x * self.speed * delta_time
+		self.position.y += self.direction.y * self.speed * delta_time
+		self.rect.x = round(self.position.x)
+		self.rect.y = round(self.position.y)
+
+	def trigger_add_life(self):
+		print('activating add-life')
+		self.sprite_manager.player_sprites_group.sprites()[0].add_health()
+
+	def trigger_big_ball(self):
+		print('activating big-ball')
+		for ball in self.sprite_manager.ball_sprites_group.sprites():
+			ball.activate_big_ball()
+
+	def trigger_small_ball(self):
+		print('activating small-ball')
+		for ball in self.sprite_manager.ball_sprites_group.sprites():
+			ball.activate_small_ball()
+
+	def trigger_fast_ball(self):
+		print('activating fast-ball')
+		for ball in self.sprite_manager.ball_sprites_group.sprites():
+			ball.activate_fast_ball()
+
+	def trigger_slow_ball(self):
+		print('activating slow-ball')
+		for ball in self.sprite_manager.ball_sprites_group.sprites():
+			ball.activate_slow_ball()
+
+	def trigger_multiple_balls(self):
+		print('activating multiple balls')
+		balls_in_game = self.sprite_manager.ball_sprites_group.sprites()
+		for ball in balls_in_game:
+			original_angle = ball.get_angle_of_direction()
+			left_angle = original_angle + math.radians(15)
+			right_angle = original_angle - math.radians(15)
+
+			kwargs = {
+				'speed': ball.speed,
+				'strength': ball.strength,
+				'active': True,
+				'big_ball': False,
+				'small_ball': False,
+				'fast_ball': False,
+				'slow_ball': False,
+				'super_ball': False,
+			}
+
+			self.sprite_manager.create_ball(
+				ball_image=ball.image,
+				midbottom=ball.rect.midbottom,
+				angle_radians=left_angle,
+				**kwargs
+			)
+			self.sprite_manager.create_ball(
+				ball_image=ball.image,
+				midbottom=ball.rect.midbottom,
+				angle_radians=right_angle,
+				**kwargs
+			)
+
+	def trigger_super_ball(self):
+		print('Activating super-ball')
+		for ball in self.sprite_manager.ball_sprites_group.sprites():
+			ball.activate_super_ball()
+
+	def trigger_big_paddle(self):
+		print('Activating big-paddle')
+		self.sprite_manager.player_sprites_group.sprites()[0].activate_big_paddle()
+
+	def trigger_small_paddle(self):
+		print('Activating small paddle')
+		self.sprite_manager.player_sprites_group.sprites()[0].activate_small_paddle()
+
 	def activate(self):
-		if self.power == 'big-ball':
-			print('activating big-ball')
-			for ball in self.ball_group.sprites():
-				ball.activate_big_ball()
-		elif self.power == 'small-ball':
-			print('activating small ball')
-			for ball in self.ball_group.sprites():
-				ball.activate_small_ball()
-		elif self.power == 'fast-ball':
-			print('activating fast-ball')
-			for ball in self.ball_group.sprites():
-				ball.activate_fast_ball()
-		elif self.power == 'slow-ball':
-			print('activating fast-ball')
-			for ball in self.ball_group.sprites():
-				ball.activate_slow_ball()
-		elif self.power == 'multiply-balls':
-			print('activating multiple balls')
-			ball_sprites = self.ball_group.sprites()
-			for ball in ball_sprites:
-				new_ball_1 = Ball(
-					sprite_groups=ball.sprite_groups,
-					image=ball.image,
-					rect=ball.rect,
-					player=ball.player,
-					blocks_group=ball.blocks_group,
-					score=self.score
-				)
-				new_ball_2 = Ball(
-					sprite_groups=ball.sprite_groups,
-					image=ball.image,
-					rect=ball.rect,
-					player=ball.player,
-					blocks_group=ball.blocks_group
-				)
+		try:
+			self.trigger_methods[self.power]()
+		except KeyError as err:
+			print(err, "Unknown power: " + self.power)
 
-				original_angle = ball.get_angle_of_direction()
-				left_angle = original_angle + math.radians(15)
-				right_angle = original_angle - math.radians(15)
-				new_ball_1.set_direction_from_angle(left_angle)
-				new_ball_2.set_direction_from_angle(right_angle)
-		elif self.power == 'super-ball':
-			print('Activating super-Ball')
-			for ball in self.ball_group.sprites():
-				ball.activate_super_ball()
-		elif self.power == 'big-paddle':
-			print('Activating big-paddle')
-			self.player.activate_big_paddle()
-		elif self.power == 'small-paddle':
-			print('Activating small paddle')
-			self.player.activate_small_paddle()
-		else:
-			raise KeyError("Unknown power: " + self.power)
-
-	def update(self):
-		if self.visible:
-			self.rect.y += self.speed
-			if self.rect.top > settings.GAME_WINDOW_HEIGHT:
-				self.visible = 0
-				self.kill()
-			if pygame.sprite.collide_rect(self, self.player):
-				self.activate()
-				self.visible = 0
-				self.score.add_score(100)
-				self.kill()
-			self.rect.y += self.speed
+	def update(self, delta_time):
+		if self.rect.top > settings.GAME_WINDOW_HEIGHT:
+			self.kill()
+		if pygame.sprite.collide_rect(self, self.sprite_manager.player_sprites_group.sprites()[0]):
+			self.activate()
+			self.sprite_manager.score_sprites_group.sprites()[0].add_score(100)
+			self.kill()
+		self.movement(delta_time)
 
 
 class Block(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, health: int, power_up: [PowerUp, None]):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect,
+			health: int,
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.health = health
-		self.power_up = power_up
 		self.update_image()
 
 	# damage information
-	def get_damage(self, amount: int, score_obj):
+	def get_damage(self, amount: int):
 		self.health -= amount
-		score_obj.add_score(10)
-		if self.health <= 0:
-			score_obj.add_score(10)
-			self.kill()
-			if self.power_up is not None:
-				self.power_up.visible = 1
+		self.sprite_manager.score_sprites_group.sprites()[0].add_score(10)
 
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
 			self.image = pygame.image.load(settings.COLOR_LEGEND[self.health])
 
-	def activate_powerup(self):
-		self.power_up.visible = 1
-
 	def update(self):
-		self.last_frame_rect = self.rect.copy()
 		self.update_image()
 		if self.health <= 0:
 			self.kill()
-			if self.power_up is not None:
-				self.activate_powerup()
+			self.sprite_manager.activate_powerup(self)
 
 
 class Ball(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect, player: Player, blocks_group, score):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
-
-		# collision objects
-		self.player = player
-		self.blocks_group = blocks_group
-		self.score = score
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect,
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
 		self.direction = pygame.math.Vector2((random.choice((1, -1)), -1))
 		self.speed = settings.DEFAULT_BALL_SPEED
@@ -300,11 +358,13 @@ class Ball(GameSprite):
 		self.rect.x = round(self.position.x)
 		self.rect.y = round(self.position.y)
 
-	def loose_the_ball(self, score_obj):
-		self.active = False
+	def loose_ball(self):
 		self.time_delay_counter = time.time()
-		if len(self.sprite_groups[1].sprites()) == 1:
-			self.player.loose_health(score_obj)
+		if len(self.sprite_manager.ball_sprites_group.sprites()) == 1:
+			self.sprite_manager.player_sprites_group.sprites()[0].loose_health()
+			self.active = False
+		else:
+			self.kill()
 
 	def frame_collision(self):
 		# Hit the left side of the game window
@@ -327,12 +387,12 @@ class Ball(GameSprite):
 
 		# Hit the bottom of the game window
 		elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
-			self.loose_the_ball(self.score)
+			self.loose_ball()
 
 	def get_overlapping_sprites(self) -> [pygame.sprite.Sprite]:
-		overlap_sprites = pygame.sprite.spritecollide(self, self.blocks_group, False)
-		if self.rect.colliderect(self.player.rect):
-			overlap_sprites.append(self.player)
+		overlap_block_sprites = pygame.sprite.spritecollide(self, self.sprite_manager.block_sprites_group, False)
+		overlap_player_sprites = pygame.sprite.spritecollide(self, self.sprite_manager.player_sprites_group, False)
+		overlap_sprites = overlap_block_sprites + overlap_player_sprites
 		return overlap_sprites
 
 	def get_overlapping_rect(self, colliding_sprites) -> pygame.rect.Rect:
@@ -399,11 +459,11 @@ class Ball(GameSprite):
 				self.rect.bottom = overlapping_rect.top
 		# Horizontal collision and Vertical and horizontal collision (perfectly hit an angle)
 		else:
-			self.loose_the_ball(self.score)
+			self.loose_ball()
 
 		hit_point_x = overlapping_rect.centerx
-		paddle_middle = self.player.rect.centerx
-		paddle_width = self.player.rect.width
+		paddle_middle = self.sprite_manager.player_sprites_group.sprites()[0].rect.centerx
+		paddle_width = self.sprite_manager.player_sprites_group.sprites()[0].rect.width
 
 		dist_from_paddle_center = hit_point_x - paddle_middle
 		angle_ratio = abs(dist_from_paddle_center) / (paddle_width / 2)
@@ -424,12 +484,12 @@ class Ball(GameSprite):
 		colliding_sprites = self.get_overlapping_sprites()
 		if len(colliding_sprites) > 0:
 			overlap_rect = self.get_overlapping_rect(colliding_sprites=colliding_sprites)
-			if self.player not in colliding_sprites:
+			if self.sprite_manager.player_sprites_group.sprites()[0] not in colliding_sprites:
 
 				for sprite in colliding_sprites:
 					if getattr(sprite, 'health', None):
 						for _ in range(self.strength):
-							sprite.get_damage(1, self.score)
+							sprite.get_damage(1)
 
 				self.handle_block_bounce(overlapping_rect=overlap_rect)
 			else:
@@ -442,15 +502,12 @@ class Ball(GameSprite):
 			if self.direction.magnitude() != 0:
 				self.direction = self.direction.normalize()
 
-			self.last_frame_rect = self.rect.copy()
-			self.last_frame_position = self.position.copy()
-
 			self.movement(delta_time)
 			self.frame_collision()
 			self.sprite_collisions()
 		else:
 			if time.time() - self.time_delay_counter > 0.5:
-				self.rect.midbottom = self.player.rect.midtop
+				self.rect.midbottom = self.sprite_manager.player_sprites_group.sprites()[0].rect.midtop
 				self.position = pygame.math.Vector2(self.rect.topleft)
 
 			if keys_pressed[pygame.K_SPACE]:
@@ -459,8 +516,14 @@ class Ball(GameSprite):
 
 
 class Scoreboard(GameSprite):
-	def __init__(self, sprite_groups, image: pygame.Surface, rect: pygame.Rect):
-		super().__init__(sprite_groups=sprite_groups, image=image, rect=rect)
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame.Rect
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
 	def update(self):
 		pass
