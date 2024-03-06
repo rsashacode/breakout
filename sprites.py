@@ -95,10 +95,14 @@ class Player(GameSprite):
 			sprite_groups,
 			image: pygame.Surface,
 			rect: pygame.Rect,
+			speed: int,
 	):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.direction = pygame.math.Vector2()
 		self.health = settings.MAX_PLAYER_HEALTH
+
+		self.speed = speed
+		self.original_speed = speed
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -108,6 +112,9 @@ class Player(GameSprite):
 		if self.rect.left < 0:
 			self.rect.left = 0
 			self.position.x = self.rect.x
+
+	def check_ball_collision(self):
+		pass
 
 	def move_paddle(self, delta_time):
 		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
@@ -137,8 +144,8 @@ class Player(GameSprite):
 		else:
 			self.direction.x = 0
 
+		self.movement(delta_time)
 		self.check_screen_constraint()
-		self.move_paddle(delta_time)
 		self.rect.x = round(self.position.x)
 
 

@@ -93,7 +93,7 @@ class SpriteManager:
 		)
 		self.blocks.append(block)
 
-	def create_player(self):
+	def create_player(self, speed: [None, int] = settings.DEFAULT_PADDLE_SPEED):
 		player_image = pygame.Surface(size=(settings.PADDLE_WIDTH, settings.PADDLE_HEIGHT))
 		player_image.fill('white')
 		player_rect = player_image.get_rect(midbottom=(settings.GAME_WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
@@ -102,6 +102,7 @@ class SpriteManager:
 			sprite_groups=[self.all_sprites_group, self.player_sprites_group],
 			image=player_image,
 			rect=player_rect,
+			speed=speed
 		)
 
 	def create_ball(
