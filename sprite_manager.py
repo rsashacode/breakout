@@ -99,7 +99,9 @@ class SpriteManager:
 		self.blocks.append(block)
 
 	def create_player(self):
-		player_image = pygame.Surface(size=(settings.PADDLE_WIDTH, settings.PADDLE_HEIGHT))
+		player_image = pygame.Surface(
+			size=(settings.PADDLE_WIDTH // (self.level_difficulty + 1), settings.PADDLE_HEIGHT)
+		)
 		player_image.fill('white')
 		player_rect = player_image.get_rect(midbottom=(settings.GAME_WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT - 20))
 		self.player = Player(
@@ -157,20 +159,16 @@ class SpriteManager:
 			for col_index, health in enumerate(row):
 				if health != ' ':
 					health = int(health) * level_number + 1
-					x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
-					y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
+					x = settings.GAP_SIZE / 2 + col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE)
+					y = settings.GAP_SIZE / 2 + row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE)
 					self.create_block(health, x, y)
 
 		if self.player is None:
 			self.create_player()
 
 		self.balls = []
-		self.create_ball()
-
-		self.player.change_size(settings.PADDLE_WIDTH // (level_difficulty + 1), settings.PADDLE_HEIGHT)
-
-		for ball in self.ball_sprites_group.sprites():
-			ball.speed = int(ball.speed + level_difficulty * ball.speed / 2)
+		ball_speed = int(settings.DEFAULT_BALL_SPEED + level_difficulty * settings.DEFAULT_BALL_SPEED / 2)
+		self.create_ball(speed=ball_speed)
 
 	def create_powerup(self, center: tuple, power: str):
 		power_up_image = pygame.image.load(settings.POWERS[power]['path'])

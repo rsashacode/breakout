@@ -53,20 +53,19 @@ DEFAULT_POWERUP_SPEED = 600
 
 # Levels
 BLOCK_MAP = [
-	'            ',
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'111111111111',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            ',
-	'            '
+	'          ',
+	'1111111111',
+	'1111111111',
+	'1111111111',
+	'1111111111',
+	'1111111111',
+	'          ',
+	'          ',
+	'          ',
+	'          ',
+	'          ',
+	'          ',
+	'          '
 ]
 
 COLOR_LEGEND = {
@@ -127,13 +126,13 @@ POWERS = {
 		'time': PADDLE_SIZE_DURATION
 	},
 	'small-paddle': {
-		'probability': 0.1,
+		'probability': 1,
 		'path': './assets/images/powerups/small-paddle.png',
 		'time': PADDLE_SIZE_DURATION
 	},
 }
 
-GAP_SIZE = 2
+GAP_SIZE = 10
 BLOCK_HEIGHT = GAME_WINDOW_HEIGHT // len(BLOCK_MAP) - GAP_SIZE
 BLOCK_WIDTH = GAME_WINDOW_WIDTH // len(BLOCK_MAP[0]) - GAP_SIZE
 

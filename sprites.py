@@ -226,13 +226,14 @@ class Block(GameSprite):
 
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
-			self.image = pygame.image.load(settings.COLOR_LEGEND[self.health])
+			new_image = pygame.image.load(settings.COLOR_LEGEND[self.health])
+			self.change_image(new_image, settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT)
 
 	def update(self):
 		self.update_image()
 		if self.health <= 0:
 			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
-				30 *(self.sprite_manager.level_difficulty + 1)
+				30 * (self.sprite_manager.level_difficulty + 1)
 			)
 			self.kill()
 			self.sprite_manager.drop_powerup(self)
