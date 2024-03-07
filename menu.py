@@ -8,14 +8,18 @@ class MainMenu:
 		# Load and scale the background image
 		self.background = pygame.image.load('./assets/images/background/menu.png').convert()
 		self.background = pygame.transform.scale(self.background, (settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
+		self.background.set_alpha(20)
 
 		# Setup font and text rendering
 		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 40)
-		self.options = ['Easy', 'Normal', 'Hard']
+		self.options = ['EASY', 'NORMAL', 'HARD']
 		self.selected_option = 1  # Index of the currently selected option
 
 		# Setup objects to blit
-		self.title_surface = self.font.render('Breakout Game', True, (255, 255, 255))
+		self.title_surface = self.font.render(
+			'WELCOME TO BREAKOUT! CHOOSE YOUR DIFFICULTY:',
+			True,
+			(255, 255, 255))
 		self.title_rect = self.title_surface.get_rect(center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 4))
 		self.objects_to_blit = []
 
@@ -51,14 +55,38 @@ class MainMenu:
 
 class LevelMenu:
 	def __init__(self):
-		self.font = pygame.font.Font(None, 48)
-		self.text = 'Congratulations! Press ENTER to move to the next level'
+		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 48)
+		self.text = 'CONGRATULATIONS! PRESS [ENTER] TO MOVE TO THE NEXT LEVEL.'
+
+		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
+		self.text_rect = self.text_surface.get_rect(
+			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
+		)
+		self.active = False
+
+	def update(self, keys_pressed: pygame.key.ScancodeWrapper):
+		if keys_pressed[pygame.K_RETURN]:
+			self.active = False
+
+
+class EndGameMenu:
+	def __init__(self):
+		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 64)
+		self.text = 'END GAME'
 
 		self.text_surface = self.font.render(self.text, True, (0, 0, 0))
 		self.text_rect = self.text_surface.get_rect(
 			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
 		)
 		self.active = False
+
+	def update_text(self, score):
+		self.text = f'END GAME! YOUR FINAL SCORE: {score}'
+
+		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
+		self.text_rect = self.text_surface.get_rect(
+			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
+		)
 
 	def update(self, keys_pressed: pygame.key.ScancodeWrapper):
 		if keys_pressed[pygame.K_RETURN]:

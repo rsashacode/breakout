@@ -110,9 +110,6 @@ class Player(GameSprite):
 			self.rect.left = 0
 			self.position.x = self.rect.x
 
-	def move_paddle(self, delta_time):
-		self.position.x += self.direction.x * settings.DEFAULT_PADDLE_SPEED * delta_time
-
 	def loose_health(self):
 		if self.health >= 1:
 			self.health -= 1
@@ -250,7 +247,7 @@ class Ball(GameSprite):
 	):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
-		self.direction = pygame.math.Vector2((random.choice((1, -1)), -1))
+		self.direction = pygame.math.Vector2((0, -1))
 
 		self.speed = speed
 		self.original_speed = speed
@@ -310,12 +307,6 @@ class Ball(GameSprite):
 		elif self.rect.top > settings.GAME_WINDOW_HEIGHT:
 			self.loose_ball()
 
-	def get_overlapping_sprites(self) -> [pygame.sprite.Sprite]:
-		overlap_block_sprites = pygame.sprite.spritecollide(self, self.sprite_manager.block_sprites_group, False)
-		overlap_player_sprites = pygame.sprite.spritecollide(self, self.sprite_manager.player_sprites_group, False)
-		overlap_sprites = overlap_block_sprites + overlap_player_sprites
-		return overlap_sprites
-
 	def get_overlapping_rect(self, colliding_sprites) -> pygame.rect.Rect:
 		total_overlap_left = settings.GAME_WINDOW_WIDTH
 		total_overlap_right = 0
@@ -343,45 +334,43 @@ class Ball(GameSprite):
 		)
 		return overlap_rect
 
-	def handle_block_bounce(self, overlapping_rect: pygame.rect.Rect) -> None:
-		# Vertical collision
-		if overlapping_rect.width > overlapping_rect.height:
-			if self.direction.y < 0:
-				self.rect.top = overlapping_rect.bottom
-			else:
-				self.rect.bottom = overlapping_rect.top
-			self.direction.y *= -1
-		# Horizontal collision
-		elif overlapping_rect.height > overlapping_rect.width:
-			if self.direction.x < 0:
-				self.rect.left = overlapping_rect.right
-			else:
-				self.rect.right = overlapping_rect.left
-			self.direction.x *= -1
-		# Vertical and horizontal collision (perfectly hit an angle)
+	def handle_vertical_collision(self, overlapping_rect):
+		if self.direction.y < 0:
+			self.rect.top = overlapping_rect.bottom
 		else:
-			if self.direction.x < 0:
-				self.rect.left = overlapping_rect.right
-			else:
-				self.rect.right = overlapping_rect.left
-			self.direction.x *= -1
-			if self.direction.y < 0:
-				self.rect.top = overlapping_rect.bottom
-			else:
-				self.rect.bottom = overlapping_rect.top
-			self.direction.y *= -1
+			self.rect.bottom = overlapping_rect.top
+		self.direction.y *= -1
 
-	def handle_paddle_collision(self, overlapping_rect: pygame.rect.Rect):
-		# Vertical collision
-		if overlapping_rect.width > overlapping_rect.height:
-			if self.direction.y < 0:
-				self.rect.top = overlapping_rect.bottom
-			else:
-				self.rect.bottom = overlapping_rect.top
-		# Horizontal collision and Vertical and horizontal collision (perfectly hit an angle)
+	def handle_horizontal_collision(self, overlapping_rect):
+		if self.direction.x < 0:
+			self.rect.left = overlapping_rect.right
 		else:
-			self.loose_ball()
+			self.rect.right = overlapping_rect.left
+		self.direction.x *= -1
 
+	def handle_diagonal_collision(self, overlapping_rect):
+		if self.direction.x < 0:
+			self.rect.left = overlapping_rect.right
+		else:
+			self.rect.right = overlapping_rect.left
+		self.direction.x *= -1
+		if self.direction.y < 0:
+			self.rect.top = overlapping_rect.bottom
+		else:
+			self.rect.bottom = overlapping_rect.top
+		self.direction.y *= -1
+
+	def handle_hor_hit_by_player(self, colliding_players):
+		player_direction_x = colliding_players[0].direction.x
+		paddle_path_per_frame = abs(round(player_direction_x * colliding_players[0].speed / settings.FPS))
+		if player_direction_x > 0:
+			self.rect.x += paddle_path_per_frame * 3
+		else:
+			self.rect.x -= paddle_path_per_frame * 3
+
+		self.direction.x = player_direction_x
+
+	def paddle_adjust_angle(self, overlapping_rect):
 		hit_point_x = overlapping_rect.centerx
 		paddle_middle = self.sprite_manager.player_sprites_group.sprites()[0].rect.centerx
 		paddle_width = self.sprite_manager.player_sprites_group.sprites()[0].rect.width
@@ -398,23 +387,43 @@ class Ball(GameSprite):
 				self.direction.x = -1 * resulting_cotangent * abs(self.direction.y)
 		else:
 			self.direction.x = 0
-		self.direction.y *= -1
 
-	def sprite_collisions(self):
-		# Get colliding sprites
-		colliding_sprites = self.get_overlapping_sprites()
+	def handle_bounce(self, overlapping_rect: pygame.rect.Rect, colliding_players):
+		if len(colliding_players) > 0:
+			if overlapping_rect.height > overlapping_rect.width:
+				self.handle_hor_hit_by_player(colliding_players)
+			elif overlapping_rect.width > overlapping_rect.height:
+				self.handle_vertical_collision(overlapping_rect)
+				self.paddle_adjust_angle(overlapping_rect)
+			else:
+				self.handle_diagonal_collision(overlapping_rect)
+		else:
+			# Vertical
+			if overlapping_rect.width > overlapping_rect.height:
+				self.handle_vertical_collision(overlapping_rect)
+			# Horizontal
+			if overlapping_rect.height > overlapping_rect.width:
+				self.handle_horizontal_collision(overlapping_rect)
+			# Diagonal
+			if overlapping_rect.height == overlapping_rect.width:
+				self.handle_diagonal_collision(overlapping_rect)
+
+	def handle_collisions(self):
+		colliding_blocks = pygame.sprite.spritecollide(self, self.sprite_manager.block_sprites_group, False)
+		colliding_players = pygame.sprite.spritecollide(self, self.sprite_manager.player_sprites_group, False)
+		colliding_sprites = colliding_blocks + colliding_players
 		if len(colliding_sprites) > 0:
 			overlap_rect = self.get_overlapping_rect(colliding_sprites=colliding_sprites)
-			if self.sprite_manager.player_sprites_group.sprites()[0] not in colliding_sprites:
+			self.handle_bounce(overlapping_rect=overlap_rect, colliding_players=colliding_players)
+
+			if len(colliding_players) == 0:
 
 				for sprite in colliding_sprites:
 					if getattr(sprite, 'health', None):
 						for _ in range(self.strength):
 							sprite.get_damage(1)
-
-				self.handle_block_bounce(overlapping_rect=overlap_rect)
-			else:
-				self.handle_paddle_collision(overlap_rect)
+			self.position.x = self.rect.x
+			self.position.y = self.rect.y
 
 	def update(self, delta_time, keys_pressed: pygame.key.ScancodeWrapper):
 
@@ -425,7 +434,8 @@ class Ball(GameSprite):
 
 			self.movement(delta_time)
 			self.frame_collision()
-			self.sprite_collisions()
+			self.handle_collisions()
+
 		else:
 			if time.time() - self.time_delay_counter > 0.5:
 				self.rect.midbottom = self.sprite_manager.player_sprites_group.sprites()[0].rect.midtop
@@ -433,7 +443,7 @@ class Ball(GameSprite):
 
 			if keys_pressed[pygame.K_SPACE]:
 				self.active = True
-				self.direction = pygame.math.Vector2((random.choice((1, -1)), -1))
+				self.direction = pygame.math.Vector2((0, -1))
 
 
 class Scoreboard(GameSprite):

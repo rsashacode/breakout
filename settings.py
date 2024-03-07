@@ -38,7 +38,7 @@ SCOREBOARD_WIDTH = WINDOW_WIDTH // 4
 GAME_WINDOW_WIDTH = WINDOW_WIDTH - SCOREBOARD_WIDTH
 GAME_WINDOW_HEIGHT = WINDOW_HEIGHT
 
-PADDLE_WIDTH = GAME_WINDOW_WIDTH // 3
+PADDLE_WIDTH = GAME_WINDOW_WIDTH // 2.5
 PADDLE_HEIGHT = WINDOW_HEIGHT // 40
 
 HEART_WIDTH = WINDOW_WIDTH // 30
@@ -54,10 +54,10 @@ DEFAULT_POWERUP_SPEED = 600
 # Levels
 BLOCK_MAP = [
 	'          ',
-	'1111111111',
-	'1111111111',
-	'1111111111',
-	'1111111111',
+	# '1111111111',
+	# '1111111111',
+	# '1111111111',
+	# '1111111111',
 	'1111111111',
 	'          ',
 	'          ',
@@ -126,7 +126,7 @@ POWERS = {
 		'time': PADDLE_SIZE_DURATION
 	},
 	'small-paddle': {
-		'probability': 1,
+		'probability': 0.1,
 		'path': './assets/images/powerups/small-paddle.png',
 		'time': PADDLE_SIZE_DURATION
 	},

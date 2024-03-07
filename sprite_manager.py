@@ -115,7 +115,7 @@ class SpriteManager:
 			self,
 			ball_image: [None, pygame.Surface] = None,
 			midbottom: [None, bool] = None,
-			angle_radians: [None, float] = math.pi / 4,
+			angle_radians: [None, float] = math.pi / 2,
 			speed: [None, int] = settings.DEFAULT_BALL_SPEED,
 			**kwargs_to_ball
 	):

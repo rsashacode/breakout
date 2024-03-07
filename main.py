@@ -3,7 +3,7 @@ import settings
 import sys
 
 from sprite_manager import SpriteManager
-from menu import MainMenu, LevelMenu
+from menu import MainMenu, LevelMenu, EndGameMenu
 
 
 class Game:
@@ -17,6 +17,7 @@ class Game:
         # Menu
         self.main_menu = MainMenu()
         self.level_menu = LevelMenu()
+        self.end_game_menu = EndGameMenu()
 
         pygame.mixer.music.load('./assets/sounds/menu.mp3')
 
@@ -32,6 +33,7 @@ class Game:
 
     def set_level_background(self):
         self.background = pygame.image.load(f'assets/images/background/level-{self.level}.jpg').convert()
+        self.background.fill((150, 150, 150), special_flags=pygame.BLEND_RGB_SUB)
         scale_factor = settings.WINDOW_HEIGHT / self.background.get_height()
         scaled_width = self.background.get_width() * scale_factor
         scaled_height = self.background.get_height() * scale_factor
@@ -48,6 +50,11 @@ class Game:
             self.game_active = False
             self.level_menu.active = True
             self.level += 1
+
+    def check_end_game(self):
+        if self.sprite_manager.player.health <= 0 or self.level >= 6:
+            self.game_active = False
+            self.end_game_menu.active = True
 
     def run(self):
         clock = pygame.time.Clock()
@@ -74,9 +81,10 @@ class Game:
             elif self.level_menu.active:
                 self.level_menu.update(keys_pressed)
                 self.display_surface.blit(self.level_menu.text_surface, self.level_menu.text_rect)
+            elif self.end_game_menu.active:
+                self.end_game_menu.update_text(self.sprite_manager.score.score)
+                self.display_surface.blit(self.end_game_menu.text_surface, self.end_game_menu.text_rect)
             else:
-                if self.level >= 6:
-                    pass   # ToDo Show final score, end game
                 if not self.game_active:
                     self.set_level_background()
                     level_difficulty = self.main_menu.selected_option
@@ -85,6 +93,7 @@ class Game:
                     self.game_active = True
                 else:
                     self.check_level_finish()
+                    self.check_end_game()
                 self.sprite_manager.update(delta_time, keys_pressed)
                 self.sprite_manager.draw_all(self.display_surface)
 
