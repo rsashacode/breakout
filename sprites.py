@@ -99,6 +99,7 @@ class Player(GameSprite):
 		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 		self.direction = pygame.math.Vector2()
 		self.health = settings.MAX_PLAYER_HEALTH
+		self.speed = settings.DEFAULT_PADDLE_SPEED
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -137,8 +138,8 @@ class Player(GameSprite):
 		else:
 			self.direction.x = 0
 
+		self.movement(delta_time)
 		self.check_screen_constraint()
-		self.move_paddle(delta_time)
 		self.rect.x = round(self.position.x)
 
 
@@ -164,7 +165,9 @@ class Score(GameSprite):
 		self.score -= points
 
 	def update(self):
+		old_rect_center = self.rect.center
 		self.image = self.font.render(f'Score: {self.score}', True, self.color)
+		self.rect = self.image.get_rect(center=old_rect_center)
 
 
 class PowerUp(GameSprite):

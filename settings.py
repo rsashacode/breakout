@@ -88,9 +88,9 @@ COLOR_LEGEND = {
 }
 
 BALL_SPEED_DURATION = 10
-BALL_SIZE_DURATION = 10
-BALL_STRENGTH_DURATION = 10
-PADDLE_SIZE_DURATION = 5
+BALL_SIZE_DURATION = 15
+BALL_STRENGTH_DURATION = 20
+PADDLE_SIZE_DURATION = 15
 
 # Powers tuple(name, probability)
 POWERS = {
@@ -100,22 +100,22 @@ POWERS = {
 		'time': -1
 	},
 	'big-ball': {
-		'probability': 0.3,
+		'probability': 0.1,
 		'path': './assets/images/powerups/big-ball.png',
 		'time': BALL_SIZE_DURATION
 	},
 	'small-ball': {
-		'probability': 0.25,
+		'probability': 0.1,
 		'path': './assets/images/powerups/small-ball.png',
 		'time': BALL_SIZE_DURATION
 	},
 	'fast-ball': {
-		'probability': 0.25,
+		'probability': 0.1,
 		'path': './assets/images/powerups/fast-ball.png',
 		'time': BALL_SPEED_DURATION
 	},
 	'slow-ball': {
-		'probability': 0.25,
+		'probability': 0.1,
 		'path': './assets/images/powerups/slow-ball.png',
 		'time': BALL_SPEED_DURATION
 	},
@@ -125,17 +125,17 @@ POWERS = {
 		'time': -1
 	},
 	'super-ball': {
-		'probability': 0.2,
+		'probability': 0.1,
 		'path': './assets/images/powerups/super-ball.png',
 		'time': BALL_STRENGTH_DURATION
 	},
 	'big-paddle': {
-		'probability': 0.2,
+		'probability': 0.1,
 		'path': './assets/images/powerups/big-paddle.png',
 		'time': PADDLE_SIZE_DURATION
 	},
 	'small-paddle': {
-		'probability': 0.2,
+		'probability': 0.1,
 		'path': './assets/images/powerups/small-paddle.png',
 		'time': PADDLE_SIZE_DURATION
 	},
