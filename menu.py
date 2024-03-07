@@ -12,7 +12,7 @@ class MainMenu:
 		# Setup font and text rendering
 		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 40)
 		self.options = ['Easy', 'Normal', 'Hard']
-		self.selected_option = 0  # Index of the currently selected option
+		self.selected_option = 1  # Index of the currently selected option
 
 		# Setup objects to blit
 		self.title_surface = self.font.render('Breakout Game', True, (255, 255, 255))

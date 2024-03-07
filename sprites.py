@@ -485,8 +485,10 @@ class PowerUpTimerInfo(GameSprite):
 
 	def update(self):
 		time_left = self.powerup_time - (time.time() - self.start_time)
+		old_rect_center = self.rect.center
 		if time_left > 0:
 			self.image = self.font.render(
 				f'{self.power_name.upper():<15} Time Left: {time_left:.2f}', True, self.color)
+			self.rect = self.image.get_rect(center=old_rect_center)
 		else:
 			self.kill()

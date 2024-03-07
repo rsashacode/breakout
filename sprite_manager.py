@@ -83,8 +83,9 @@ class SpriteManager:
 		self.hearts.append(heart)
 
 	def create_block(self, health, x, y):
+		block_image = pygame.image.load(settings.COLOR_LEGEND[health])
 		block_image = pygame.transform.scale(
-			surface=pygame.image.load(settings.COLOR_LEGEND[health]),
+			surface=block_image,
 			size=(settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT)
 		)
 		block_rect = block_image.get_rect(topleft=(x, y))
@@ -201,8 +202,8 @@ class SpriteManager:
 		font = pygame.font.Font(None, size=20)
 		image = font.render(f'Time Left: {powerup_time}', True, color)
 		rect = image.get_rect(
-			topleft=(
-				settings.GAME_WINDOW_WIDTH + settings.SCOREBOARD_WIDTH // 10,
+			center=(
+				settings.GAME_WINDOW_WIDTH + settings.SCOREBOARD_WIDTH // 2,
 				last_y + settings.GAME_WINDOW_HEIGHT // 20
 			)
 		)
