@@ -42,7 +42,7 @@ SCOREBOARD_WIDTH = WINDOW_WIDTH // 5
 GAME_WINDOW_WIDTH = WINDOW_WIDTH - SCOREBOARD_WIDTH
 GAME_WINDOW_HEIGHT = WINDOW_HEIGHT
 
-PADDLE_WIDTH = GAME_WINDOW_WIDTH // 5
+PADDLE_WIDTH = GAME_WINDOW_WIDTH // 3
 PADDLE_HEIGHT = WINDOW_HEIGHT // 40
 
 HEART_WIDTH = WINDOW_WIDTH // 30
@@ -52,7 +52,7 @@ FPS = 60
 
 # Speeds of objects
 PADDLE_SPEED_PER_PIXEL = 0.001
-BALL_SPEED_PER_PIXEL = 0.0004
+BALL_SPEED_PER_PIXEL = 0.0003
 POWERUP_SPEED_PER_PIXEL = 0.0005
 
 DEFAULT_PADDLE_SPEED = PADDLE_SPEED_PER_PIXEL * NUM_PIXELS
@@ -61,10 +61,11 @@ DEFAULT_POWERUP_SPEED = POWERUP_SPEED_PER_PIXEL * NUM_PIXELS
 
 # Levels
 BLOCK_MAP = [
-	'666666666666',
-	'444557755444',
-	'333333333333',
-	'222222222222',
+	'            ',
+	'111111111111',
+	'111111111111',
+	'111111111111',
+	'111111111111',
 	'111111111111',
 	'            ',
 	'            ',
@@ -77,38 +78,69 @@ BLOCK_MAP = [
 ]
 
 COLOR_LEGEND = {
-	1: './assets/blocks/1.png',
-	2: './assets/blocks/2.png',
-	3: './assets/blocks/3.png',
-	4: './assets/blocks/4.png',
-	5: './assets/blocks/5.png',
-	6: './assets/blocks/6.png',
-	7: './assets/blocks/7.png'
+	1: './assets/images/blocks/1.png',
+	2: './assets/images/blocks/2.png',
+	3: './assets/images/blocks/3.png',
+	4: './assets/images/blocks/4.png',
+	5: './assets/images/blocks/5.png',
+	6: './assets/images/blocks/6.png',
+	7: './assets/images/blocks/7.png'
 }
 
-POWER_UP_IMAGES = [
-	'./assets/other/heart.png',
-	'./assets/other/laser.png',
-	'./assets/other/size.png',
-	'./assets/other/speed.png'
-]
+BALL_SPEED_DURATION = 10
+BALL_SIZE_DURATION = 10
+BALL_STRENGTH_DURATION = 10
+PADDLE_SIZE_DURATION = 5
 
 # Powers tuple(name, probability)
-POWERS = [
-	('add-life', 0.1),
-	('big-ball', 0.3),
-	('small-ball', 0.3),
-	('fast-ball', 0.25),
-	('slow-ball', 0.25),
-	('multiply-balls', 0.1),
-	('super-ball', 0.2),
-	('big-paddle', 0.2),
-	('small-paddle', 0.2)
-]
-BALL_SPEED_DURATION = 5
-BALL_SIZE_DURATION = 5
-BALL_STRENGTH_DURATION = 5
-PADDLE_SIZE_DURATION = 5
+POWERS = {
+	'add-life': {
+		'probability': 0.1,
+		'path': './assets/images/powerups/add-life.png',
+		'time': -1
+	},
+	'big-ball': {
+		'probability': 0.3,
+		'path': './assets/images/powerups/big-ball.png',
+		'time': BALL_SIZE_DURATION
+	},
+	'small-ball': {
+		'probability': 0.25,
+		'path': './assets/images/powerups/small-ball.png',
+		'time': BALL_SIZE_DURATION
+	},
+	'fast-ball': {
+		'probability': 0.25,
+		'path': './assets/images/powerups/fast-ball.png',
+		'time': BALL_SPEED_DURATION
+	},
+	'slow-ball': {
+		'probability': 0.25,
+		'path': './assets/images/powerups/slow-ball.png',
+		'time': BALL_SPEED_DURATION
+	},
+	'multiply-balls': {
+		'probability': 0.1,
+		'path': './assets/images/powerups/multiply-balls.png',
+		'time': -1
+	},
+	'super-ball': {
+		'probability': 0.2,
+		'path': './assets/images/powerups/super-ball.png',
+		'time': BALL_STRENGTH_DURATION
+	},
+	'big-paddle': {
+		'probability': 0.2,
+		'path': './assets/images/powerups/big-paddle.png',
+		'time': PADDLE_SIZE_DURATION
+	},
+	'small-paddle': {
+		'probability': 0.2,
+		'path': './assets/images/powerups/small-paddle.png',
+		'time': PADDLE_SIZE_DURATION
+	},
+}
+
 
 GAP_SIZE = 2
 BLOCK_HEIGHT = WINDOW_HEIGHT / len(BLOCK_MAP) - GAP_SIZE

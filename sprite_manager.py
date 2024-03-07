@@ -4,7 +4,7 @@ import random
 import math
 
 from powerup_manager import PowerUpManager
-from sprites import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard
+from sprites import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
 
 
 class SpriteManager:
@@ -19,22 +19,26 @@ class SpriteManager:
 			self.scoreboard_sprites_group,
 			self.heart_sprites_group,
 			self.power_up_sprites_group,
-			self.score_sprites_group
-		) = (pygame.sprite.Group() for _ in range(8))
+			self.score_sprites_group,
+			self.power_up_timer_info_group
+		) = (pygame.sprite.Group() for _ in range(9))
 
 		self.scoreboard = None
 		self.score = None
-		self.hearts = []
-		self.blocks = []
+		self.hearts = None
+		self.blocks = None
 		self.player = None
-		self.balls = []
+		self.balls = None
 		self.power_ups = []
+		self.power_up_infos = []
 
 		self.powerup_manager = PowerUpManager(self)
 		self.heart_horizontal_gap = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
 
+		self.level_difficulty = None
+
 	def create_scoreboard(self):
-		scoreboard_image = pygame.image.load('./assets/other/scoreboard.png').convert_alpha()
+		scoreboard_image = pygame.image.load('assets/images/background/scoreboard.png').convert_alpha()
 		scoreboard_image = pygame.transform.scale(
 			surface=scoreboard_image,
 			size=(settings.SCOREBOARD_WIDTH, settings.WINDOW_HEIGHT)
@@ -64,7 +68,7 @@ class SpriteManager:
 		)
 
 	def create_heart(self, midtop: tuple):
-		heart_image = pygame.image.load('./assets/other/heart_s.png').convert_alpha()
+		heart_image = pygame.image.load('assets/images/hearts/heart_s.png').convert_alpha()
 		heart_image = pygame.transform.scale(
 			surface=heart_image,
 			size=(settings.HEART_WIDTH, settings.HEART_HEIGHT)
@@ -113,7 +117,7 @@ class SpriteManager:
 			**kwargs_to_ball
 	):
 		if not ball_image:
-			ball_image = pygame.image.load('./assets/other/Ball.png').convert_alpha()
+			ball_image = pygame.image.load('assets/images/ball/ball.png').convert_alpha()
 		if not midbottom:
 			midbottom = self.player.rect.midtop
 		ball_rect = ball_image.get_rect(midbottom=midbottom)
@@ -131,30 +135,44 @@ class SpriteManager:
 
 		self.balls.append(new_ball)
 
-	def init_level(self):
+	def init_level(self, level_number=0, level_difficulty=0):
+		self.level_difficulty = level_difficulty
+
 		self.create_scoreboard()
-		self.create_score()
+		if self.score is None:
+			self.create_score()
 
-		for i in range(settings.MAX_PLAYER_HEALTH):
-			heart_midtop = (
-				settings.GAME_WINDOW_WIDTH + (i + 1) * self.heart_horizontal_gap,
-				settings.GAME_WINDOW_HEIGHT // 7
-			)
-			self.create_heart(midtop=heart_midtop)
+		if self.hearts is None:
+			self.hearts = []
+			for i in range(settings.MAX_PLAYER_HEALTH):
+				heart_midtop = (
+					settings.GAME_WINDOW_WIDTH + (i + 1) * self.heart_horizontal_gap,
+					settings.GAME_WINDOW_HEIGHT // 7
+				)
+				self.create_heart(midtop=heart_midtop)
 
+		self.blocks = []
 		for row_index, row in enumerate(settings.BLOCK_MAP):
 			for col_index, health in enumerate(row):
 				if health != ' ':
-					health = int(health)
+					health = int(health) * level_number + 1
 					x = col_index * (settings.BLOCK_WIDTH + settings.GAP_SIZE) + settings.GAP_SIZE // 2
 					y = row_index * (settings.BLOCK_HEIGHT + settings.GAP_SIZE) + settings.GAP_SIZE // 2
 					self.create_block(health, x, y)
 
-		self.create_player()
+		if self.player is None:
+			self.create_player()
+
+		self.balls = []
 		self.create_ball()
 
+		self.player.change_size(settings.PADDLE_WIDTH // (level_difficulty + 1), settings.PADDLE_HEIGHT)
+
+		for ball in self.ball_sprites_group.sprites():
+			ball.speed = int(ball.speed + level_difficulty * ball.speed / 2)
+
 	def create_powerup(self, center: tuple, power: str):
-		power_up_image = pygame.image.load(random.choice(settings.POWER_UP_IMAGES))
+		power_up_image = pygame.image.load(settings.POWERS[power]['path'])
 		power_up_rect = power_up_image.get_rect(center=center)
 		power_up = PowerUp(
 			sprite_manager=self,
@@ -166,17 +184,51 @@ class SpriteManager:
 		)
 		self.power_ups.append(power_up)
 
-	def activate_powerup(self, block: Block):
+	def powerup_info_coexists(self, power_name: str, existing_power_names: list, power):
+		pass  # ToDo
+
+	def create_powerup_timer_info(self, power_name: str, powerup_time: [int, float]):
+		last_y = settings.WINDOW_HEIGHT // 3
+		existing_power_names = []
+		powerup_info_sprites = self.power_up_timer_info_group.sprites()
+		for powerup_info_sprite in powerup_info_sprites:
+			existing_power_names.append(powerup_info_sprite.power_name)
+			if powerup_info_sprite.rect.y > last_y:
+				last_y = powerup_info_sprite.rect.y
+
+		# self.powerup_info_coexists(power_name, existing_power_names)
+		color = pygame.Color('white')
+		font = pygame.font.Font(None, size=20)
+		image = font.render(f'Time Left: {powerup_time}', True, color)
+		rect = image.get_rect(
+			topleft=(
+				settings.GAME_WINDOW_WIDTH + settings.SCOREBOARD_WIDTH // 10,
+				last_y + settings.GAME_WINDOW_HEIGHT // 20
+			)
+		)
+		powerup_info = PowerUpTimerInfo(
+			sprite_manager=self,
+			sprite_groups=[self.all_sprites_group, self.power_up_timer_info_group],
+			image=image,
+			rect=rect,
+			font=font,
+			color=color,
+			power_name=power_name,
+			powerup_time=powerup_time
+		)
+		self.power_up_infos.append(powerup_info)
+
+	def drop_powerup(self, block: Block):
 		random_number = random.random()
 		potential_powers = []
-		for power in settings.POWERS:
-			if random_number <= power[1]:
+		for power in settings.POWERS.keys():
+			if random_number <= settings.POWERS[power]['probability']:
 				potential_powers.append(power)
 		if len(potential_powers) > 0:
-			chosen_power = random.choice(potential_powers)[0]
+			chosen_power = random.choice(potential_powers)
 			self.create_powerup(block.rect.center, chosen_power)
 
-	def update(self, delta_time: float, keys_pressed):
+	def update(self, delta_time: float, keys_pressed: pygame.key.ScancodeWrapper):
 		# update the game
 		self.powerup_manager.update()
 		self.player.update(delta_time, keys_pressed)
@@ -185,6 +237,7 @@ class SpriteManager:
 		self.heart_sprites_group.update()
 		self.power_up_sprites_group.update(delta_time)
 		self.score_sprites_group.update()
+		self.power_up_timer_info_group.update()
 
 	def draw_all(self, display_surface):
 		self.player_sprites_group.draw(surface=display_surface)
@@ -194,3 +247,4 @@ class SpriteManager:
 		self.heart_sprites_group.draw(surface=display_surface)
 		self.power_up_sprites_group.draw(surface=display_surface)
 		self.score_sprites_group.draw(surface=display_surface)
+		self.power_up_timer_info_group.draw(surface=display_surface)

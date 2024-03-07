@@ -186,13 +186,17 @@ class PowerUp(GameSprite):
 
 	def activate(self):
 		self.powerup_manager.activate_powerup(self.power)
+		if settings.POWERS[self.power]['time'] != -1:
+			self.sprite_manager.create_powerup_timer_info(self.power, settings.POWERS[self.power]['time'])
 
 	def update(self, delta_time):
 		if self.rect.top > settings.GAME_WINDOW_HEIGHT:
 			self.kill()
 		if pygame.sprite.collide_rect(self, self.sprite_manager.player_sprites_group.sprites()[0]):
 			self.activate()
-			self.sprite_manager.score_sprites_group.sprites()[0].add_score(100)
+			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
+				100 * (self.sprite_manager.level_difficulty + 1)
+			)
 			self.kill()
 		self.movement(delta_time)
 
@@ -213,7 +217,9 @@ class Block(GameSprite):
 	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
-		self.sprite_manager.score_sprites_group.sprites()[0].add_score(10)
+		self.sprite_manager.score_sprites_group.sprites()[0].add_score(
+			10 * (self.sprite_manager.level_difficulty + 1)
+		)
 
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
@@ -222,8 +228,11 @@ class Block(GameSprite):
 	def update(self):
 		self.update_image()
 		if self.health <= 0:
+			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
+				30 *(self.sprite_manager.level_difficulty + 1)
+			)
 			self.kill()
-			self.sprite_manager.activate_powerup(self)
+			self.sprite_manager.drop_powerup(self)
 
 
 class Ball(GameSprite):
@@ -435,3 +444,46 @@ class Scoreboard(GameSprite):
 
 	def update(self):
 		pass
+
+
+class PowerUpIcon(GameSprite):
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
+
+	def update(self, time):
+		pass
+
+
+class PowerUpTimerInfo(GameSprite):
+	def __init__(
+			self,
+			sprite_manager,
+			sprite_groups,
+			image: pygame.Surface,
+			rect: pygame,
+			font: pygame.font.Font,
+			color: pygame.Color,
+			power_name: str,
+			powerup_time: [int, float]
+	):
+		super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
+
+		self.font = font
+		self.color = color
+		self.powerup_time = powerup_time
+		self.start_time = time.time()
+		self.power_name = power_name
+
+	def update(self):
+		time_left = self.powerup_time - (time.time() - self.start_time)
+		if time_left > 0:
+			self.image = self.font.render(
+				f'{self.power_name.upper():<15} Time Left: {time_left:.2f}', True, self.color)
+		else:
+			self.kill()
