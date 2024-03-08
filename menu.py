@@ -11,7 +11,7 @@ class MainMenu:
 		self.background.set_alpha(20)
 
 		# Setup font and text rendering
-		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 40)
+		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
 		self.options = ['EASY', 'NORMAL', 'HARD']
 		self.selected_option = 1  # Index of the currently selected option
 
@@ -55,8 +55,8 @@ class MainMenu:
 
 class LevelMenu:
 	def __init__(self):
-		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 48)
-		self.text = 'CONGRATULATIONS! PRESS [ENTER] TO MOVE TO THE NEXT LEVEL.'
+		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
+		self.text = 'CONGRATULATIONS! PRESS [ENTER] TO CONTINUE.'
 
 		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
 		self.text_rect = self.text_surface.get_rect(
@@ -71,7 +71,7 @@ class LevelMenu:
 
 class EndGameMenu:
 	def __init__(self):
-		self.font = pygame.font.Font('assets/fonts/BAUHS93.TTF', 64)
+		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
 		self.text = 'END GAME'
 
 		self.text_surface = self.font.render(self.text, True, (0, 0, 0))

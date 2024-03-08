@@ -69,8 +69,8 @@ class PowerUpManager:
 	def activate_big_ball(self):
 		print('Activating big-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			new_width = round(ball.original_width * 2)
-			new_height = round(ball.original_width * 2)
+			new_width = round(ball.original_width * 1.5)
+			new_height = round(ball.original_width * 1.5)
 			ball.change_size(new_width, new_height)
 		self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 

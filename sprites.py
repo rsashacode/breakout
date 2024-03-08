@@ -2,7 +2,6 @@ import copy
 
 import pygame
 import settings
-import random
 import math
 import time
 
@@ -187,6 +186,17 @@ class PowerUp(GameSprite):
 	def activate(self):
 		self.powerup_manager.activate_powerup(self.power)
 		if settings.POWERS[self.power]['time'] != -1:
+			powerup_timers_in_game = self.sprite_manager.power_up_timer_info_group.sprites()
+			for powerup_timer in powerup_timers_in_game:
+
+				powerup_timer_power_name = powerup_timer.power_name
+				conflicting_power = settings.POWERS[powerup_timer_power_name]['conflicting-power']
+
+				if powerup_timer_power_name == self.power:
+					powerup_timer.kill()
+				elif conflicting_power is not None:
+					if conflicting_power == self.power:
+						powerup_timer.kill()
 			self.sprite_manager.create_powerup_timer_info(self.power, settings.POWERS[self.power]['time'])
 
 	def update(self, delta_time):
@@ -441,9 +451,11 @@ class Ball(GameSprite):
 				self.rect.midbottom = self.sprite_manager.player_sprites_group.sprites()[0].rect.midtop
 				self.position = pygame.math.Vector2(self.rect.topleft)
 
-			if keys_pressed[pygame.K_SPACE]:
-				self.active = True
-				self.direction = pygame.math.Vector2((0, -1))
+				if keys_pressed[pygame.K_SPACE]:
+					self.active = True
+					self.direction = pygame.math.Vector2((0, -1))
+			else:
+				pass
 
 
 class Scoreboard(GameSprite):
@@ -499,7 +511,7 @@ class PowerUpTimerInfo(GameSprite):
 		old_rect_center = self.rect.center
 		if time_left > 0:
 			self.image = self.font.render(
-				f'{self.power_name.upper():<15} Time Left: {time_left:.2f}', True, self.color)
+				f'{self.power_name.upper()} Time Left: {time_left:.2f}', True, self.color)
 			self.rect = self.image.get_rect(center=old_rect_center)
 		else:
 			self.kill()

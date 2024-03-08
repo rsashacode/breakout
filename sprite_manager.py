@@ -54,7 +54,7 @@ class SpriteManager:
 
 	def create_score(self):
 		score_color = pygame.Color('white')
-		score_font = pygame.font.Font(None, size=36)
+		score_font = pygame.font.Font(settings.GAME_FONT, size=settings.SCORE_FONT_SIZE)
 		score_image = score_font.render(f'Score: 0', True, score_color)
 		score_rect = score_image.get_rect(
 			center=(settings.WINDOW_WIDTH - settings.SCOREBOARD_WIDTH // 2, settings.WINDOW_HEIGHT // 4))
@@ -121,6 +121,10 @@ class SpriteManager:
 	):
 		if not ball_image:
 			ball_image = pygame.image.load('assets/images/ball/ball.png').convert_alpha()
+			ball_image = pygame.transform.smoothscale(
+				ball_image,
+				(settings.WINDOW_WIDTH / 30, settings.WINDOW_WIDTH / 30)
+			)
 		if not midbottom:
 			midbottom = self.player.rect.midtop
 		ball_rect = ball_image.get_rect(midbottom=midbottom)
@@ -197,7 +201,7 @@ class SpriteManager:
 
 		# self.powerup_info_coexists(power_name, existing_power_names)
 		color = pygame.Color('white')
-		font = pygame.font.Font(None, size=20)
+		font = pygame.font.Font(settings.GAME_FONT, size=settings.POWERUP_FONT_SIZE)
 		image = font.render(f'Time Left: {powerup_time}', True, color)
 		rect = image.get_rect(
 			center=(
