@@ -117,6 +117,7 @@ class Player(GameSprite):
 			heart_sprites = self.sprite_manager.heart_sprites_group.sprites()
 			heart_sprites[-1].kill()
 			self.sprite_manager.score_sprites_group.sprites()[0].subtract_score(200)
+			self.lost_hp_sound.stop()
 			self.lost_hp_sound.play()
 
 	def add_health(self):
@@ -204,6 +205,7 @@ class PowerUp(GameSprite):
 					if conflicting_power == self.power:
 						powerup_timer.kill()
 			self.sprite_manager.create_powerup_timer_info(self.power, settings.POWERS[self.power]['time'])
+		self.powerup_sound.stop()
 		self.powerup_sound.play()
 
 	def update(self, delta_time):
@@ -244,6 +246,7 @@ class Block(GameSprite):
 			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
 				30 * (self.sprite_manager.level_difficulty + 1)
 			)
+			self.break_sound.stop()
 			self.break_sound.play()
 			self.kill()
 			self.sprite_manager.drop_powerup(self)
@@ -251,6 +254,7 @@ class Block(GameSprite):
 			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
 				10 * (self.sprite_manager.level_difficulty + 1)
 			)
+			self.hit_sound.stop()
 			self.hit_sound.play()
 
 	def update_image(self):
@@ -450,6 +454,7 @@ class Ball(GameSprite):
 						for _ in range(self.strength):
 							sprite.get_damage(1)
 			else:
+				self.hit_paddle_sound.stop()
 				self.hit_paddle_sound.play()
 			self.position.x = self.rect.x
 			self.position.y = self.rect.y
