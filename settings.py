@@ -81,10 +81,10 @@ DEFAULT_POWERUP_SPEED = DEFAULT_POWERUP_SPEED_PER_BASE * SPEED_COEFFICIENT
 # BLOCKS
 BLOCK_MAP = [
 	'          ',
-	# '1111111111',
-	# '1111111111',
-	# '1111111111',
-	# '1111111111',
+	'1111111111',
+	'1111111111',
+	'1111111111',
+	'1111111111',
 	'1111111111',
 	'          ',
 	'          ',
@@ -124,13 +124,13 @@ POWERS = {
 		'conflicting-power': None
 	},
 	'big-ball': {
-		'probability': 1,
+		'probability': 0.1,
 		'path': './assets/images/powerups/big-ball.png',
 		'time': BALL_SIZE_DURATION,
 		'conflicting-power': 'small-ball'
 	},
 	'small-ball': {
-		'probability': 1,
+		'probability': 0.1,
 		'path': './assets/images/powerups/small-ball.png',
 		'time': BALL_SIZE_DURATION,
 		'conflicting-power': 'big-ball'

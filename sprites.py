@@ -100,6 +100,8 @@ class Player(GameSprite):
 		self.health = settings.MAX_PLAYER_HEALTH
 		self.speed = settings.DEFAULT_PADDLE_SPEED
 
+		self.lost_hp_sound = pygame.mixer.Sound('./assets/sounds/lost_hp.mp3')
+
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
 			self.rect.right = settings.GAME_WINDOW_WIDTH
@@ -115,6 +117,7 @@ class Player(GameSprite):
 			heart_sprites = self.sprite_manager.heart_sprites_group.sprites()
 			heart_sprites[-1].kill()
 			self.sprite_manager.score_sprites_group.sprites()[0].subtract_score(200)
+			self.lost_hp_sound.play()
 
 	def add_health(self):
 		if self.health < settings.MAX_PLAYER_HEALTH:
@@ -183,6 +186,9 @@ class PowerUp(GameSprite):
 		self.power = power
 		self.powerup_manager = powerup_manager
 
+		self.powerup_sound = pygame.mixer.Sound('./assets/sounds/get powerup.mp3')
+		self.powerup_sound.set_volume(0.3)
+
 	def activate(self):
 		self.powerup_manager.activate_powerup(self.power)
 		if settings.POWERS[self.power]['time'] != -1:
@@ -198,6 +204,7 @@ class PowerUp(GameSprite):
 					if conflicting_power == self.power:
 						powerup_timer.kill()
 			self.sprite_manager.create_powerup_timer_info(self.power, settings.POWERS[self.power]['time'])
+		self.powerup_sound.play()
 
 	def update(self, delta_time):
 		if self.rect.top > settings.GAME_WINDOW_HEIGHT:
@@ -224,12 +231,27 @@ class Block(GameSprite):
 		self.health = health
 		self.update_image()
 
+		self.hit_sound = pygame.mixer.Sound('./assets/sounds/hit blocks.mp3')
+		self.hit_sound.set_volume(0.25)
+
+		self.break_sound = pygame.mixer.Sound('./assets/sounds/break blocks.mp3')
+		self.break_sound.set_volume(0.75)
+
 	# damage information
 	def get_damage(self, amount: int):
 		self.health -= amount
-		self.sprite_manager.score_sprites_group.sprites()[0].add_score(
-			10 * (self.sprite_manager.level_difficulty + 1)
-		)
+		if self.health <= 0:
+			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
+				30 * (self.sprite_manager.level_difficulty + 1)
+			)
+			self.break_sound.play()
+			self.kill()
+			self.sprite_manager.drop_powerup(self)
+		else:
+			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
+				10 * (self.sprite_manager.level_difficulty + 1)
+			)
+			self.hit_sound.play()
 
 	def update_image(self):
 		if self.health in settings.COLOR_LEGEND:
@@ -238,12 +260,6 @@ class Block(GameSprite):
 
 	def update(self):
 		self.update_image()
-		if self.health <= 0:
-			self.sprite_manager.score_sprites_group.sprites()[0].add_score(
-				30 * (self.sprite_manager.level_difficulty + 1)
-			)
-			self.kill()
-			self.sprite_manager.drop_powerup(self)
 
 
 class Ball(GameSprite):
@@ -266,6 +282,7 @@ class Ball(GameSprite):
 		self.original_strength = 1
 
 		self.time_delay_counter = 0
+		self.hit_paddle_sound = pygame.mixer.Sound('./assets/sounds/hit paddle.mp3')
 		self.active = False
 
 	def get_angle_of_direction(self):
@@ -432,6 +449,8 @@ class Ball(GameSprite):
 					if getattr(sprite, 'health', None):
 						for _ in range(self.strength):
 							sprite.get_damage(1)
+			else:
+				self.hit_paddle_sound.play()
 			self.position.x = self.rect.x
 			self.position.y = self.rect.y
 

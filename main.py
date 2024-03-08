@@ -20,6 +20,7 @@ class Game:
         self.end_game_menu = EndGameMenu()
 
         pygame.mixer.music.load('./assets/sounds/menu.mp3')
+        pygame.mixer.music.set_volume(0.75)
 
         # Background
         self.background = self.main_menu.background
@@ -33,14 +34,20 @@ class Game:
 
     def set_level_background(self):
         self.background = pygame.image.load(f'assets/images/background/level-{self.level}.jpg').convert()
-        self.background.fill((150, 150, 150), special_flags=pygame.BLEND_RGB_SUB)
-        scale_factor = settings.WINDOW_HEIGHT / self.background.get_height()
+        self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)
+        scale_factor = max([
+            settings.WINDOW_HEIGHT / self.background.get_height(),
+            settings.WINDOW_WIDTH / self.background.get_width()
+        ])
         scaled_width = self.background.get_width() * scale_factor
         scaled_height = self.background.get_height() * scale_factor
         self.background = pygame.transform.scale(self.background, (scaled_width, scaled_height))
 
     def load_level_music(self):
-        pass
+        pygame.mixer.music.unload()
+        music_address = f'assets/sounds/level-{self.level}.mp3'
+        pygame.mixer.music.load(music_address)
+        pygame.mixer.music.play(fade_ms=1000)
 
     def check_level_finish(self):
         if len(self.sprite_manager.block_sprites_group.sprites()) == 0:
@@ -52,7 +59,7 @@ class Game:
             self.level += 1
 
     def check_end_game(self):
-        if self.sprite_manager.player.health <= 0 or self.level >= 6:
+        if self.sprite_manager.player.health <= 0 or self.level > 6:
             self.game_active = False
             self.end_game_menu.active = True
 
@@ -87,6 +94,7 @@ class Game:
             else:
                 if not self.game_active:
                     self.set_level_background()
+                    self.load_level_music()
                     level_difficulty = self.main_menu.selected_option
                     self.sprite_manager.init_level(self.level, level_difficulty)
                     self.load_level_music()
