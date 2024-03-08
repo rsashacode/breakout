@@ -47,7 +47,7 @@ class GameSprite(pygame.sprite.Sprite):
 
 	def change_size(self, new_width: int, new_height: int):
 		rect_center = self.rect.center
-		self.image = pygame.transform.scale(self.image, (new_width, new_height))
+		self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
 		self.rect = self.image.get_rect(center=rect_center)
 		self.rect.height = new_height
 		self.update_position_from_rect()

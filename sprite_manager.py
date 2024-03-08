@@ -121,7 +121,7 @@ class SpriteManager:
 	):
 		if not ball_image:
 			ball_image = pygame.image.load('assets/images/ball/ball.png').convert_alpha()
-			ball_image = pygame.transform.smoothscale(
+			ball_image = pygame.transform.scale(
 				ball_image,
 				(settings.WINDOW_WIDTH / 30, settings.WINDOW_WIDTH / 30)
 			)
