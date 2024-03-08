@@ -1,23 +1,30 @@
-import copy
+from __future__ import annotations
 
+import copy
 import pygame
 import settings
 import math
 import time
+import utils
 
 from powerup_manager import PowerUpManager
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from sprite_manager import SpriteManager
 
 
-class GameSprite(pygame.sprite.Sprite):
+class _GameSprite(pygame.sprite.Sprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups: Any,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect
 	):
-		super().__init__(sprite_groups)
+		pygame.sprite.Sprite.__init__(self)
+		for group in sprite_groups:
+			self.add(group)
 
 		self.sprite_manager = sprite_manager
 		self.sprite_groups = sprite_groups
@@ -45,14 +52,19 @@ class GameSprite(pygame.sprite.Sprite):
 		self.position.x = self.rect.x
 		self.position.y = self.rect.y
 
-	def change_size(self, new_width: int, new_height: int):
+	def change_size(
+			self,
+			new_width: int,
+			new_height: int
+	):
 		rect_center = self.rect.center
 		self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
 		self.rect = self.image.get_rect(center=rect_center)
 		self.rect.height = new_height
 		self.update_position_from_rect()
 
-	def change_image(self, new_image: pygame.Surface, new_width: int, new_height: int):
+	def change_image(
+			self, new_image: pygame.Surface, new_width: int, new_height: int):
 		rect_center = self.rect.center
 		self.image = pygame.transform.scale(
 			new_image, (new_width, new_height)
@@ -73,11 +85,11 @@ class GameSprite(pygame.sprite.Sprite):
 		self.update_position_from_rect()
 
 
-class Heart(GameSprite):
+class Heart(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect
 	):
@@ -87,11 +99,11 @@ class Heart(GameSprite):
 		pass
 
 
-class Player(GameSprite):
+class Player(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect,
 	):
@@ -100,7 +112,8 @@ class Player(GameSprite):
 		self.health = settings.MAX_PLAYER_HEALTH
 		self.speed = settings.DEFAULT_PADDLE_SPEED
 
-		self.lost_hp_sound = pygame.mixer.Sound('./assets/sounds/lost_hp.mp3')
+		lost_hp_sound_path = utils.get_asset_path('sounds/lost_hp.mp3')
+		self.lost_hp_sound = pygame.mixer.Sound(lost_hp_sound_path)
 
 	def check_screen_constraint(self):
 		if self.rect.right > settings.GAME_WINDOW_WIDTH:
@@ -143,11 +156,11 @@ class Player(GameSprite):
 		self.rect.x = round(self.position.x)
 
 
-class Score(GameSprite):
+class Score(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect,
 			font: pygame.font.Font,
@@ -170,11 +183,11 @@ class Score(GameSprite):
 		self.rect = self.image.get_rect(center=old_rect_center)
 
 
-class PowerUp(GameSprite):
+class PowerUp(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect,
 			powerup_manager: PowerUpManager,
@@ -187,7 +200,8 @@ class PowerUp(GameSprite):
 		self.power = power
 		self.powerup_manager = powerup_manager
 
-		self.powerup_sound = pygame.mixer.Sound('./assets/sounds/get powerup.mp3')
+		powerup_sound_path = utils.get_asset_path('sounds/get powerup.mp3')
+		self.powerup_sound = pygame.mixer.Sound(powerup_sound_path)
 		self.powerup_sound.set_volume(0.3)
 
 	def activate(self):
@@ -220,11 +234,11 @@ class PowerUp(GameSprite):
 		self.movement(delta_time)
 
 
-class Block(GameSprite):
+class Block(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect,
 			health: int,
@@ -233,10 +247,12 @@ class Block(GameSprite):
 		self.health = health
 		self.update_image()
 
-		self.hit_sound = pygame.mixer.Sound('./assets/sounds/hit blocks.mp3')
+		hit_sound_path = utils.get_asset_path('sounds/hit blocks.mp3')
+		self.hit_sound = pygame.mixer.Sound(hit_sound_path)
 		self.hit_sound.set_volume(0.25)
 
-		self.break_sound = pygame.mixer.Sound('./assets/sounds/break blocks.mp3')
+		break_sound_path = utils.get_asset_path('sounds/break blocks.mp3')
+		self.break_sound = pygame.mixer.Sound(break_sound_path)
 		self.break_sound.set_volume(0.75)
 
 	# damage information
@@ -266,11 +282,11 @@ class Block(GameSprite):
 		self.update_image()
 
 
-class Ball(GameSprite):
+class Ball(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect,
 			speed: int
@@ -286,7 +302,9 @@ class Ball(GameSprite):
 		self.original_strength = 1
 
 		self.time_delay_counter = 0
-		self.hit_paddle_sound = pygame.mixer.Sound('./assets/sounds/hit paddle.mp3')
+
+		hit_paddle_sound_path = utils.get_asset_path('sounds/hit paddle.mp3')
+		self.hit_paddle_sound = pygame.mixer.Sound(hit_paddle_sound_path)
 		self.active = False
 
 	def get_angle_of_direction(self):
@@ -482,11 +500,11 @@ class Ball(GameSprite):
 				pass
 
 
-class Scoreboard(GameSprite):
+class Scoreboard(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame.Rect
 	):
@@ -496,7 +514,7 @@ class Scoreboard(GameSprite):
 		pass
 
 
-class PowerUpIcon(GameSprite):
+class PowerUpIcon(_GameSprite):
 	def __init__(
 			self,
 			sprite_manager,
@@ -510,11 +528,11 @@ class PowerUpIcon(GameSprite):
 		pass
 
 
-class PowerUpTimerInfo(GameSprite):
+class PowerUpTimerInfo(_GameSprite):
 	def __init__(
 			self,
-			sprite_manager,
-			sprite_groups,
+			sprite_manager: SpriteManager,
+			sprite_groups: list[pygame.sprite.AbstractGroup],
 			image: pygame.Surface,
 			rect: pygame,
 			font: pygame.font.Font,

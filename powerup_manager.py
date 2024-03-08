@@ -13,6 +13,7 @@ class PowerUpTimer:
 
 	def start(self, duration: int):
 		current_time = time.time()
+
 		self.start_time, self.current_time = current_time, current_time
 		self.duration = duration
 		self.active = True
@@ -21,6 +22,7 @@ class PowerUpTimer:
 		if self.active:
 			self.start_time += time_in_pause
 			self.current_time = time.time()
+
 			if self.current_time - self.start_time > self.duration:
 				self.active = False
 				self.duration, self.start_time, self.current_time = (None, None, None)
@@ -61,7 +63,7 @@ class PowerUpManager:
 		try:
 			self.trigger_methods[power]()
 		except KeyError as e:
-			print('Unknown power! Skip activating', str(e))
+			print('Unknown power! Skip deactivating', str(e))
 
 	def activate_add_life(self):
 		print('activating add-life')
@@ -70,17 +72,21 @@ class PowerUpManager:
 	def activate_big_ball(self):
 		print('Activating big-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
+
 			new_width = round(ball.original_width * 1.5)
 			new_height = round(ball.original_width * 1.5)
 			ball.change_size(new_width, new_height)
+
 		self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
 	def activate_small_ball(self):
 		print('activating small-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
+
 			new_width = round(ball.original_width * 0.5)
 			new_height = round(ball.original_height * 0.5)
 			ball.change_size(new_width, new_height)
+
 		self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
 	def activate_fast_ball(self):
@@ -98,13 +104,17 @@ class PowerUpManager:
 	def activate_multiple_balls(self):
 		print('activating multiple balls')
 		balls_in_game = self.sprite_manager.ball_sprites_group.sprites()
+
 		if len(balls_in_game) <= 20:
 			for ball in balls_in_game:
+				original_width = ball.rect.width
+				original_height = ball.rect.height
+
 				original_angle = ball.get_angle_of_direction()
 				left_angle = original_angle + math.radians(15)
 				right_angle = original_angle - math.radians(15)
 
-				kwargs = {
+				ball_kwargs = {
 					'speed': ball.speed,
 					'original_speed': ball.speed,
 					'strength': ball.strength,
@@ -116,32 +126,33 @@ class PowerUpManager:
 					'slow_ball': False,
 					'super_ball': False,
 				}
-
-				self.sprite_manager.create_ball(
-					ball_image=ball.image,
-					midbottom=ball.rect.midbottom,
-					angle_radians=left_angle,
-					**kwargs
-				)
-				self.sprite_manager.create_ball(
-					ball_image=ball.image,
-					midbottom=ball.rect.midbottom,
-					angle_radians=right_angle,
-					**kwargs
-				)
+				for angle in [left_angle, right_angle]:
+					self.sprite_manager.create_ball(
+						ball_image=ball.image,
+						midbottom=ball.rect.midbottom,
+						angle_radians=angle,
+						**ball_kwargs
+					)
+				self.sprite_manager.ball_sprites_group.sprites()[-1].change_size(original_width, original_height)
 
 	def activate_super_ball(self):
 		print('Activating super-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.change_strength(int(ball.original_strength * 2))
-			self.ball_strength_timer.start(settings.BALL_STRENGTH_DURATION)
+			ball.change_strength(
+				int(ball.original_strength * 2)
+			)
+			self.ball_strength_timer.start(
+				settings.BALL_STRENGTH_DURATION
+			)
 
 	def activate_big_paddle(self):
 		print('Activating big-paddle')
 		for player in self.sprite_manager.player_sprites_group.sprites():
+
 			original_width = player.original_width
 			original_height = player.original_height
 			new_paddle_width = int(original_width * 2)
+
 			player.change_size(new_paddle_width, original_height)
 			self.paddle_size_timer.start(settings.PADDLE_SIZE_DURATION)
 

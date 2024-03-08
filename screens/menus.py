@@ -2,11 +2,14 @@ import pygame
 import settings
 import time
 
+from utils import get_asset_path
+
 
 class MainMenu:
 	def __init__(self):
 		# Load and scale the background image
-		self.background = pygame.image.load('./assets/images/background/menu.png').convert()
+		background_image_path = get_asset_path('images/background/menu.png')
+		self.background = pygame.image.load(background_image_path).convert()
 		self.background = pygame.transform.scale(self.background, (settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
 		self.background.set_alpha(20)
 
@@ -26,6 +29,7 @@ class MainMenu:
 		self.active = True
 		self.update_objects_to_blit()
 
+		# Used to handle smooth selection
 		self.last_pressed = time.time()
 
 	def update_objects_to_blit(self):
@@ -72,25 +76,25 @@ class LevelMenu:
 class EndGameMenu:
 	def __init__(self):
 		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
-		self.text = 'END GAME'
+		self.text = 'END GAME. PRESS [ENTER] TO RESTART'
 
 		self.text_surface = self.font.render(self.text, True, (0, 0, 0))
 		self.text_rect = self.text_surface.get_rect(
 			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
 		)
 		self.active = False
+		self.restart_needed = False
 
-	def update_text(self, score):
-		self.text = f'END GAME! YOUR FINAL SCORE: {score}'
-
+	def update(self, keys_pressed: pygame.key.ScancodeWrapper, score: int):
+		self.text = f'YOUR FINAL SCORE: {score}. PRESS [ENTER] TO RESTART'
 		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
 		self.text_rect = self.text_surface.get_rect(
 			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
 		)
-
-	def update(self, keys_pressed: pygame.key.ScancodeWrapper):
-		if keys_pressed[pygame.K_RETURN]:
-			self.active = False
+		if self.active:
+			if keys_pressed[pygame.K_RETURN]:
+				self.active = False
+				self.restart_needed = True
 
 
 class PauseMenu:

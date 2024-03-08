@@ -1,3 +1,5 @@
+import utils
+
 # GRAPHICS
 
 RESOLUTIONS = {
@@ -51,7 +53,7 @@ WINDOW_WIDTH = SELECTED_RESOLUTION['window-width']
 WINDOW_HEIGHT = SELECTED_RESOLUTION['window-height']
 NUM_PIXELS = WINDOW_WIDTH * WINDOW_HEIGHT
 
-GAME_FONT = './assets/fonts/joystix monospace.otf'
+GAME_FONT = utils.get_asset_path('fonts/joystix monospace.otf')
 MENU_FONT_SIZE = SELECTED_RESOLUTION['menu-font-size']
 SCORE_FONT_SIZE = SELECTED_RESOLUTION['score-font-size']
 POWERUP_FONT_SIZE = SELECTED_RESOLUTION['powerup-font-size']
@@ -99,13 +101,13 @@ BLOCK_MAP = [
 ]
 
 COLOR_LEGEND = {
-	1: './assets/images/blocks/1.png',
-	2: './assets/images/blocks/2.png',
-	3: './assets/images/blocks/3.png',
-	4: './assets/images/blocks/4.png',
-	5: './assets/images/blocks/5.png',
-	6: './assets/images/blocks/6.png',
-	7: './assets/images/blocks/7.png'
+	1: utils.get_asset_path('images/blocks/1.png'),
+	2: utils.get_asset_path('images/blocks/2.png'),
+	3: utils.get_asset_path('images/blocks/3.png'),
+	4: utils.get_asset_path('images/blocks/4.png'),
+	5: utils.get_asset_path('images/blocks/5.png'),
+	6: utils.get_asset_path('images/blocks/6.png'),
+	7: utils.get_asset_path('images/blocks/7.png')
 }
 
 GAP_SIZE = 10
@@ -122,55 +124,55 @@ PADDLE_SIZE_DURATION = 15
 POWERS = {
 	'add-life': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/add-life.png',
+		'path': utils.get_asset_path('images/powerups/add-life.png'),
 		'time': -1,
 		'conflicting-power': None
 	},
 	'big-ball': {
-		'probability': 0.1,
-		'path': './assets/images/powerups/big-ball.png',
+		'probability': 1,
+		'path': utils.get_asset_path('images/powerups/big-ball.png'),
 		'time': BALL_SIZE_DURATION,
 		'conflicting-power': 'small-ball'
 	},
 	'small-ball': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/small-ball.png',
+		'path': utils.get_asset_path('images/powerups/small-ball.png'),
 		'time': BALL_SIZE_DURATION,
 		'conflicting-power': 'big-ball'
 	},
 	'fast-ball': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/fast-ball.png',
+		'path': utils.get_asset_path('images/powerups/fast-ball.png'),
 		'time': BALL_SPEED_DURATION,
 		'conflicting-power': 'slow-ball'
 	},
 	'slow-ball': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/slow-ball.png',
+		'path': utils.get_asset_path('images/powerups/slow-ball.png'),
 		'time': BALL_SPEED_DURATION,
 		'conflicting-power': 'fast-ball'
 	},
 	'multiply-balls': {
-		'probability': 0.1,
-		'path': './assets/images/powerups/multiply-balls.png',
+		'probability': 1,
+		'path': utils.get_asset_path('images/powerups/multiply-balls.png'),
 		'time': -1,
 		'conflicting-power': None
 	},
 	'super-ball': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/super-ball.png',
+		'path': utils.get_asset_path('images/powerups/super-ball.png'),
 		'time': BALL_STRENGTH_DURATION,
 		'conflicting-power': None
 	},
 	'big-paddle': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/big-paddle.png',
+		'path': utils.get_asset_path('images/powerups/big-paddle.png'),
 		'time': PADDLE_SIZE_DURATION,
 		'conflicting-power': 'small-paddle'
 	},
 	'small-paddle': {
 		'probability': 0.1,
-		'path': './assets/images/powerups/small-paddle.png',
+		'path': utils.get_asset_path('images/powerups/small-paddle.png'),
 		'time': PADDLE_SIZE_DURATION,
 		'conflicting-power': 'big-paddle'
 	},
