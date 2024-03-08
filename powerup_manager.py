@@ -17,8 +17,9 @@ class PowerUpTimer:
 		self.duration = duration
 		self.active = True
 
-	def update(self):
+	def update(self, time_in_pause: float = 0):
 		if self.active:
+			self.start_time += time_in_pause
 			self.current_time = time.time()
 			if self.current_time - self.start_time > self.duration:
 				self.active = False
@@ -184,23 +185,23 @@ class PowerUpManager:
 		if 'super-ball' in self.active_powerups:
 			self.active_powerups.remove('super-ball')
 
-	def update(self):
+	def update(self, time_in_pause: float = 0):
 		if self.paddle_size_timer.active:
-			self.paddle_size_timer.update()
+			self.paddle_size_timer.update(time_in_pause)
 			if not self.paddle_size_timer.active:
 				self.deactivate_paddle_size()
 
 		if self.ball_size_timer.active:
-			self.ball_size_timer.update()
+			self.ball_size_timer.update(time_in_pause)
 			if not self.ball_size_timer.active:
 				self.deactivate_ball_size()
 
 		if self.ball_speed_timer.active:
-			self.ball_speed_timer.update()
+			self.ball_speed_timer.update(time_in_pause)
 			if not self.ball_speed_timer.active:
 				self.deactivate_ball_speed()
 
 		if self.ball_strength_timer.active:
-			self.ball_strength_timer.update()
+			self.ball_strength_timer.update(time_in_pause)
 			if not self.ball_strength_timer.active:
 				self.deactivate_ball_strength()

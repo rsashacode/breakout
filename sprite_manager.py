@@ -123,7 +123,7 @@ class SpriteManager:
 			ball_image = pygame.image.load('assets/images/ball/ball.png').convert_alpha()
 			ball_image = pygame.transform.scale(
 				ball_image,
-				(settings.WINDOW_WIDTH / 30, settings.WINDOW_WIDTH / 30)
+				(settings.WINDOW_WIDTH / 40, settings.WINDOW_WIDTH / 40)
 			)
 		if not midbottom:
 			midbottom = self.player.rect.midtop
@@ -231,16 +231,16 @@ class SpriteManager:
 			chosen_power = random.choice(potential_powers)
 			self.create_powerup(block.rect.center, chosen_power)
 
-	def update(self, delta_time: float, keys_pressed: pygame.key.ScancodeWrapper):
+	def update(self, delta_time: float, keys_pressed: pygame.key.ScancodeWrapper, time_in_pause: float = 0):
 		# update the game
-		self.powerup_manager.update()
+		self.powerup_manager.update(time_in_pause)
 		self.player.update(delta_time, keys_pressed)
 		self.block_sprites_group.update()
 		self.ball_sprites_group.update(delta_time, keys_pressed)
 		self.heart_sprites_group.update()
 		self.power_up_sprites_group.update(delta_time)
 		self.score_sprites_group.update()
-		self.power_up_timer_info_group.update()
+		self.power_up_timer_info_group.update(time_in_pause)
 
 	def draw_all(self, display_surface):
 		self.player_sprites_group.draw(surface=display_surface)

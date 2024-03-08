@@ -91,3 +91,19 @@ class EndGameMenu:
 	def update(self, keys_pressed: pygame.key.ScancodeWrapper):
 		if keys_pressed[pygame.K_RETURN]:
 			self.active = False
+
+
+class PauseMenu:
+	def __init__(self):
+		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
+		self.text = 'PAUSE. PRESS [SPACE] TO CONTINUE.'
+
+		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
+		self.text_rect = self.text_surface.get_rect(
+			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
+		)
+		self.active = False
+
+	def update(self, keys_pressed: pygame.key.ScancodeWrapper):
+		if keys_pressed[pygame.K_SPACE]:
+			self.active = False

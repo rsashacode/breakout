@@ -1,9 +1,10 @@
 import pygame
 import settings
 import sys
+import time
 
 from sprite_manager import SpriteManager
-from menu import MainMenu, LevelMenu, EndGameMenu
+from menus import MainMenu, LevelMenu, EndGameMenu, PauseMenu
 
 
 class Game:
@@ -16,6 +17,7 @@ class Game:
 
         # Menu
         self.main_menu = MainMenu()
+        self.pause_menu = PauseMenu()
         self.level_menu = LevelMenu()
         self.end_game_menu = EndGameMenu()
 
@@ -30,6 +32,8 @@ class Game:
 
         # Game Stage
         self.game_active = False
+        self.start_pause_time = 0
+        self.time_in_pause = 0
         self.level = 0
 
     def set_level_background(self):
@@ -78,6 +82,10 @@ class Game:
                     sys.exit()
 
             keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_ESCAPE] and self.game_active:
+                self.pause_menu.active = True
+                self.start_pause_time = time.time()
+
             self.display_surface.blit(source=self.background, dest=(0, 0))
 
             if self.main_menu.active:
@@ -91,6 +99,10 @@ class Game:
             elif self.end_game_menu.active:
                 self.end_game_menu.update_text(self.sprite_manager.score.score)
                 self.display_surface.blit(self.end_game_menu.text_surface, self.end_game_menu.text_rect)
+            elif self.pause_menu.active:
+                self.pause_menu.update(keys_pressed)
+                self.display_surface.blit(self.pause_menu.text_surface, self.pause_menu.text_rect)
+                self.time_in_pause = time.time() - self.start_pause_time
             else:
                 if not self.game_active:
                     self.set_level_background()
@@ -100,10 +112,13 @@ class Game:
                     self.load_level_music()
                     self.game_active = True
                 else:
-                    self.check_level_finish()
-                    self.check_end_game()
-                self.sprite_manager.update(delta_time, keys_pressed)
-                self.sprite_manager.draw_all(self.display_surface)
+                    if not self.pause_menu.active:
+                        self.check_level_finish()
+                        self.check_end_game()
+                        self.sprite_manager.update(delta_time, keys_pressed, self.time_in_pause)
+                        self.sprite_manager.draw_all(self.display_surface)
+                        self.time_in_pause = 0
+                        self.start_pause_time = 0
 
             pygame.display.update()
 

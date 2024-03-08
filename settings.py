@@ -45,7 +45,7 @@ RESOLUTIONS = {
 	},
 }
 
-SELECTED_RESOLUTION = RESOLUTIONS['1600x900']
+SELECTED_RESOLUTION = RESOLUTIONS['1366x768']
 
 WINDOW_WIDTH = SELECTED_RESOLUTION['window-width']
 WINDOW_HEIGHT = SELECTED_RESOLUTION['window-height']
@@ -86,6 +86,9 @@ BLOCK_MAP = [
 	'1111111111',
 	'1111111111',
 	'1111111111',
+	'          ',
+	'          ',
+	'          ',
 	'          ',
 	'          ',
 	'          ',

@@ -530,7 +530,8 @@ class PowerUpTimerInfo(GameSprite):
 		self.start_time = time.time()
 		self.power_name = power_name
 
-	def update(self):
+	def update(self, time_in_pause: float = 0):
+		self.start_time += time_in_pause
 		time_left = self.powerup_time - (time.time() - self.start_time)
 		old_rect_center = self.rect.center
 		if time_left > 0:
