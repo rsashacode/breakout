@@ -4,10 +4,9 @@ import pygame
 import settings
 import random
 import math
+import path_utils
 
 from typing import TYPE_CHECKING
-
-import utils
 from powerup_manager import PowerUpManager
 
 if not TYPE_CHECKING:
@@ -45,7 +44,7 @@ class SpriteManager:
 		self.level_difficulty = None
 
 	def create_scoreboard(self):
-		scoreboard_image_path = utils.get_asset_path('images/background/scoreboard.png')
+		scoreboard_image_path = path_utils.get_asset_path('images/background/scoreboard.png')
 		scoreboard_image = pygame.image.load(scoreboard_image_path).convert_alpha()
 		scoreboard_image = pygame.transform.scale(
 			surface=scoreboard_image,
@@ -76,7 +75,7 @@ class SpriteManager:
 		)
 
 	def create_heart(self, midtop: tuple):
-		heart_image_path = utils.get_asset_path('images/hearts/heart_s.png')
+		heart_image_path = path_utils.get_asset_path('images/hearts/heart_s.png')
 		heart_image = pygame.image.load(heart_image_path).convert_alpha()
 		heart_image = pygame.transform.scale(
 			surface=heart_image,
@@ -129,7 +128,7 @@ class SpriteManager:
 			**kwargs_to_ball
 	):
 		if not ball_image:
-			ball_image_path = utils.get_asset_path('images/ball/ball.png')
+			ball_image_path = path_utils.get_asset_path('images/ball/ball.png')
 			ball_image = pygame.image.load(ball_image_path).convert_alpha()
 			ball_image = pygame.transform.scale(
 				ball_image,

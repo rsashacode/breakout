@@ -1,11 +1,16 @@
+import logging
 import pygame
 import settings
 import sys
 import time
-import utils
+import path_utils
 
+from log import logger
 from sprites.sprite_manager import SpriteManager
 from screens import MainMenu, LevelMenu, EndGameMenu, PauseMenu
+
+
+game_logger = logging.getLogger('')
 
 
 class Game:
@@ -23,7 +28,7 @@ class Game:
         self.end_game_menu = EndGameMenu()
 
         # Music
-        self.menu_music_path = utils.get_asset_path('sounds/menu.mp3')
+        self.menu_music_path = path_utils.get_asset_path('sounds/menu.mp3')
         pygame.mixer.music.load(self.menu_music_path)
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer.music.play(-1)
@@ -66,7 +71,7 @@ class Game:
         self.sprite_manager = SpriteManager()
 
     def set_level_background(self):
-        background_path = utils.get_asset_path(f'images/background/level-{self.level}.jpg')
+        background_path = path_utils.get_asset_path(f'images/background/level-{self.level}.jpg')
         self.background = pygame.image.load(background_path).convert()
         self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)
         scale_factor = max([
@@ -79,7 +84,7 @@ class Game:
 
     def load_level_music(self):
         pygame.mixer.music.unload()
-        level_music_path = utils.get_asset_path(f'sounds/level-{self.level}.mp3')
+        level_music_path = path_utils.get_asset_path(f'sounds/level-{self.level}.mp3')
         pygame.mixer.music.load(level_music_path)
         pygame.mixer.music.play(fade_ms=1000)
 
