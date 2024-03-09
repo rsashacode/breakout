@@ -22,7 +22,8 @@ install instruction:
 
 ## Feature
 
-Challenge three unique game modes, beyond the traditional paddle, ball, and blocks, we've also added special power-ups to enhance your gaming experience even more!
+Challenge three unique game modes, beyond the traditional paddle, ball, and blocks, 
+We've also added special power-ups to enhance your gaming experience even more!
 
 ## Prerequisites
 
