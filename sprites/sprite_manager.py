@@ -14,7 +14,37 @@ if not TYPE_CHECKING:
 
 
 class SpriteManager:
+	"""
+		Sprite manager class.
+		Handles creation of sprites, updates them and draws on the provided surface.
+		Provides interface to access another sprites using the composition pattern.
 
+		Attributes:
+		self.all_sprites_group,
+				self.block_sprites_group,
+				self.player_sprites_group,
+				self.ball_sprites_group,
+				self.scoreboard_sprites_group,
+				self.heart_sprites_group,
+				self.power_up_sprites_group,
+				self.score_sprites_group,
+				self.power_up_timer_info_group
+			) = (pygame.sprite.Group() for _ in range(9))
+
+			self.scoreboard: (None, Scoreboard) = None
+			self.score: (Score, Scoreboard) = None
+			self.hearts: (list, list[Heart]) = []
+			self.blocks: (list, list[Block]) = []
+			self.player: (None, Player) = None
+			self.balls: (list, list[Ball]) = []
+			self.power_ups: (list, list[PowerUp]) = []
+			self.power_up_infos: (list, list[PowerUpTimerInfo]) = []
+
+			self.powerup_manager: PowerUpManager = PowerUpManager(self)
+			self.heart_horizontal_gap: int = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
+
+			self.level_difficulty: (None, int) = None
+		"""
 	def __init__(self):
 		# Sprites groups
 		(
