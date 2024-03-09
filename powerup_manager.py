@@ -11,20 +11,29 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from sprites.sprite_manager import SpriteManager
 
-
 game_logger = logging.getLogger('')
 
 
 class PowerUpTimer:
 	"""
 	Simple timer. Stores and updates time passed since the activation
-	"""
-	def __init__(self):
-		self.start_time = None
-		self.current_time = None
 
-		self.duration = None
-		self.active = False
+		Attributes:
+
+		- start_time (None, float, int): The starting time of the timer. Defaults to None.
+		- current_time (None, float, int): The current time of the timer. Defaults to None.
+		- duration (None, float, int): Duration of timer set. Defaults to None.
+		- active (bool): If the timer is active. Defaults to False.
+
+		version: 1
+	"""
+
+	def __init__(self):
+		self.start_time: [None, float, int] = None
+		self.current_time: [None, float, int] = None
+
+		self.duration: [None, float, int] = None
+		self.active: bool = False
 
 	def start(self, duration: int):
 		"""
@@ -58,6 +67,7 @@ class PowerUpManager:
 	Handles the powerups. Stores active powerups, activates and deactivates
 	them, handles powerup timers.
 	"""
+
 	def __init__(self, sprite_manager: SpriteManager):
 		"""
 		:param sprite_manager: instance of the SpriteManager
@@ -105,7 +115,7 @@ class PowerUpManager:
 
 	def activate_big_ball(self, start_timer: bool = True):
 		"""
-		Increase the size of all balls in game with the factor of 1.5 to the original size
+		Increase the size of all balls in game by a factor of 1.5 to the original size
 
 		:param start_timer: if true, start timer
 		"""
@@ -116,6 +126,7 @@ class PowerUpManager:
 			new_height = round(ball.original_width * 1.5)
 			ball.change_size(new_width, new_height)
 
+			# To restore the original look.
 			if 'super-ball' in self.active_powerups:
 				self.activate_super_ball(start_timer=False)
 
@@ -124,7 +135,7 @@ class PowerUpManager:
 
 	def activate_small_ball(self, start_timer: bool = True):
 		"""
-		Decrease the size of all balls in game with the factor of 0.5 to the original size
+		Decrease the size of all balls in game by a factor of 0.5 to the original size
 
 		:param start_timer: if true, start timer
 		"""
@@ -135,6 +146,7 @@ class PowerUpManager:
 			new_height = round(ball.original_height * 0.5)
 			ball.change_size(new_width, new_height)
 
+			# To restore the original look.
 			if 'super-ball' in self.active_powerups:
 				self.activate_super_ball(start_timer=False)
 
@@ -143,7 +155,7 @@ class PowerUpManager:
 
 	def activate_fast_ball(self, start_timer: bool = True):
 		"""
-		Increase the speed of all balls in game with the factor of 2 to the original speed
+		Increase the speed of all balls in game by a factor of 2 to the original speed
 
 		:param start_timer: if true, start timer
 		"""
@@ -156,7 +168,7 @@ class PowerUpManager:
 
 	def activate_slow_ball(self, start_timer=True):
 		"""
-		Decrease the speed of all balls in game with the factor of 0.5 to the original speed
+		Decrease the speed of all balls in game by a factor of 0.5 to the original speed
 
 		:param start_timer: if true, start timer
 		"""
@@ -173,6 +185,8 @@ class PowerUpManager:
 
 		The first ball created has a direction of -135 degrees to the x-axis
 		The second ball created has a direction of -45 degrees to the x-axis
+
+		All necessary attributes of the original ball are passed to new ones.
 		"""
 		game_logger.info('Activating multiply-balls powerup')
 		balls_in_game = self.sprite_manager.ball_sprites_group.sprites()
@@ -204,6 +218,8 @@ class PowerUpManager:
 						angle_radians=angle,
 						**ball_kwargs
 					)
+
+				# Change sizes of balls if powerups are active.
 				if 'big-ball' in self.active_powerups:
 					self.activate_big_ball(start_timer=False)
 				if 'small-ball' in self.active_powerups:
@@ -211,9 +227,9 @@ class PowerUpManager:
 
 	def activate_super_ball(self, start_timer=True):
 		"""
-		Increase the strength of all balls in game with the factor of 2 to the original strength
+		Increase the strength of all balls in game by a factor of 2 to the original strength
 
-		All affected balls are + 125 red in color
+		All affected balls are + 125 red in color.
 		:param start_timer: if true, start timer
 		"""
 		game_logger.info('Activating super-ball powerup')
@@ -224,9 +240,13 @@ class PowerUpManager:
 				self.ball_strength_timer.start(settings.BALL_STRENGTH_DURATION)
 
 	def activate_big_paddle(self, start_timer=True):
-		print('Activating big-paddle')
-		for player in self.sprite_manager.player_sprites_group.sprites():
+		"""
+		Increase the length of the paddle by a factor of 2 to the original length.
 
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating big-paddle powerup')
+		for player in self.sprite_manager.player_sprites_group.sprites():
 			original_width = player.original_width
 			original_height = player.original_height
 			new_paddle_width = int(original_width * 2)
@@ -237,7 +257,12 @@ class PowerUpManager:
 			self.paddle_size_timer.start(settings.PADDLE_SIZE_DURATION)
 
 	def activate_small_paddle(self, start_timer=True):
-		print('Activating small paddle')
+		"""
+		Decrease the length of the paddle by a factor of 0.5 to the original length.
+
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating small paddle')
 		for player in self.sprite_manager.player_sprites_group.sprites():
 			original_width = player.original_width
 			original_height = player.original_height
@@ -248,7 +273,10 @@ class PowerUpManager:
 			self.paddle_size_timer.start(settings.PADDLE_SIZE_DURATION)
 
 	def deactivate_paddle_size(self):
-		print('Deactivating paddle size powerup')
+		"""
+		Deactivate powerups related to the size of the paddle and restores its size.
+		"""
+		game_logger.info('Deactivating paddle size powerup')
 		for player in self.sprite_manager.player_sprites_group.sprites():
 			player.restore_size()
 		for power in ['big-paddle', 'small-paddle']:
@@ -256,7 +284,10 @@ class PowerUpManager:
 				self.active_powerups.remove(power)
 
 	def deactivate_ball_size(self):
-		print('Deactivating ball size powerup')
+		"""
+		Deactivate powerups related to the size of balls in the game and restores their size.
+		"""
+		game_logger.info('Deactivating ball size powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_size()
 		for power in ['big-ball', 'small-ball']:
@@ -264,7 +295,10 @@ class PowerUpManager:
 				self.active_powerups.remove(power)
 
 	def deactivate_ball_speed(self):
-		print('Deactivating ball speed powerup')
+		"""
+		Deactivate powerups related to the speed of balls in the game and restores their speed.
+		"""
+		game_logger.info('Deactivating ball speed powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_speed()
 		for power in ['fast-ball', 'slow-ball']:
@@ -276,7 +310,6 @@ class PowerUpManager:
 		Restore the strength of all balls in game
 
 		All affected balls are restored in color.
-		:param start_timer: if true, start timer
 		"""
 		game_logger.info('Deactivating ball strength powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -290,6 +323,11 @@ class PowerUpManager:
 			self.active_powerups.remove('super-ball')
 
 	def update(self, time_in_pause: float = 0):
+		"""
+		Update timers according to the duration of powerups, deactivate powerups if needed.
+
+		:param time_in_pause: time spent in pause to correct timers
+		"""
 		if self.paddle_size_timer.active:
 			self.paddle_size_timer.update(time_in_pause)
 			if not self.paddle_size_timer.active:

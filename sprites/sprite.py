@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import pygame
 import settings
 import math
@@ -15,6 +14,37 @@ if TYPE_CHECKING:
 
 
 class _GameSprite(pygame.sprite.Sprite):
+	"""
+	Base class for all game sprites. All game sprites must inherit from this class.
+
+	Sprite is registered in groups provided.
+
+	Attributes:
+
+		- sprite_manager (SpriteManager): Instance of sprites.SpriteManager class
+		- sprite_groups (list[pygame.sprite.AbstractGroup]): Any collection of any group types in pygame.sprite.Group
+		- image (pygame.Surface): An image of the sprite. Must be an instance of pygame.Surface
+		- rect (pygame.Rect): An instance of the pygame.Rect class
+		- position (pygame.math.Vector2): Position of sprite on the screen. Defaults to pygame.math.Vector2(rect.topleft)
+		- direction (pygame.math.Vector2): Direction in which sprites moves along x and y-axis.
+		Defaults to pygame.math.Vector2((0, 0)
+		-speed (int, float): Speed of movement. Defaults to 0
+		- original_image (pygame.Surface): A copy of the original image provided during construction.
+		Defaults to image.copy(). Used primarily for powerup handling.
+		- original_rect (pygame.Rect): A copy of the original rectangle provided during construction.
+		Defaults to rect.copy(). Used primarily for powerup handling.
+		- original_width (int): The width of the original rectangle. Defaults to rect.width.
+		Used primarily for powerup handling.
+		- original_height (int): The height of the original rectangle. Defaults to rect.width.
+		Used primarily for powerup handling.
+
+	version: 1
+
+	:param sprite_manager: Instance of the sprites.SpriteManager class.
+	:param sprite_groups: Any collection of any group types in pygame.sprite.Group.
+	:param image: An image of the sprite. Must be an instance of pygame.Surface.
+	:param rect: An instance of the pygame.Rect class.
+	"""
 	def __init__(
 			self,
 			sprite_manager: SpriteManager,
@@ -41,15 +71,26 @@ class _GameSprite(pygame.sprite.Sprite):
 		self.original_height = self.rect.height
 
 	def update(self, *args, **kwargs):
+		"""
+		Updates the sprite based on the game logic.
+		"""
 		raise NotImplemented('Sprite class must implement "update" method')
 
-	def movement(self, delta_time):
+	def movement(self, delta_time: (int, float)):
+		"""
+		Updates the position of sprite based on current position, speed, delta time and direction.
+
+		:param delta_time: Time passed since last frame.
+		"""
 		self.position.x += self.direction.x * self.speed * delta_time
 		self.position.y += self.direction.y * self.speed * delta_time
 		self.rect.x = round(self.position.x)
 		self.rect.y = round(self.position.y)
 
 	def update_position_from_rect(self):
+		"""
+		Update position attribute for rectangle attribute.
+		"""
 		self.position.x = self.rect.x
 		self.position.y = self.rect.y
 
@@ -58,6 +99,15 @@ class _GameSprite(pygame.sprite.Sprite):
 			new_width: int,
 			new_height: int
 	):
+		"""
+		Change size of the sprite based on the new width and height provided.
+
+		The new image is created from the original one. Does not handle active powerups.
+
+		:param new_width: New width.
+		:param new_height: New height.
+		:return:
+		"""
 		rect_center = self.rect.center
 		self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
 		self.rect = self.image.get_rect(center=rect_center)
@@ -65,11 +115,23 @@ class _GameSprite(pygame.sprite.Sprite):
 		self.update_position_from_rect()
 
 	def change_image(
-			self, new_image: pygame.Surface, new_width: int, new_height: int):
+			self,
+			new_image: pygame.Surface,
+			new_width: int,
+			new_height: int
+	):
+		"""
+		Change image of the sprite based on the image, new width and height provided.
+
+		The new image is created from the provided one. Does not handle active powerups.
+
+		:param new_image: New image of type pygame.Surface.
+		:param new_width: New width.
+		:param new_height: New height.
+		:return:
+		"""
 		rect_center = self.rect.center
-		self.image = pygame.transform.scale(
-			new_image, (new_width, new_height)
-		)
+		self.image = pygame.transform.scale(new_image, (new_width, new_height))
 		self.rect = self.image.get_rect(center=rect_center)
 		self.update_position_from_rect()
 

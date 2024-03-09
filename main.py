@@ -6,6 +6,7 @@ import time
 import path_utils
 
 from log import logger
+from pathlib import Path
 from sprites.sprite_manager import SpriteManager
 from screens import MainMenu, LevelMenu, EndGameMenu, PauseMenu
 
@@ -18,40 +19,62 @@ class Game:
     The main game class.
 
     Handles all the updates and drawing of the objects, menus and screens.
+
+        Attributes:
+
+        - display_surface (pygame.Surface): Main screen surface on which everything is displayed.
+        - title (str): The name displayed at the top of the screen. Defaults to "Breakout Game"
+        - clock (pygame.time.Clock): Timer to run the game at persistent time rate.
+        - main_menu (MainMenu): Main menu object.
+        - pause_menu (PauseMenu): Pause menu object.
+        - level_menu (LevelMenu): Level menu object.
+        - end_game_menu (EndGameMenu): End game menu object.
+        - background (pygame.Surface): The background of the game.
+        - sprite_manager (SpriteManager): The sprite manager object handling the behaviour of all sprites in the game.
+        - game_active (bool): Whether the game is active or not. Defaults to False.
+        - start_pause_time (int, float): The time when the game was set on pause. Defaults to 0.
+        - time_in_pause (int, float): The amount of time spent in pause. Defaults to 0.
+        - level (int): The level of the game. Defaults to 0. Must be a number from 0 to 6.
+        - level_difficulty (int): The difficulty of the game. Defaults to 0. Must be a number from 0 to 2.
+        - keys_pressed (pygame.key.ScancodeWrapper): The keys pressed during the game.
+
+        version: 1
     """
     def __init__(self):
         # General Setup
         pygame.init()
-        self.display_surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
-        self.title = 'Breakout Game'
-        self.clock = pygame.time.Clock()
+        self.display_surface: pygame.Surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
+        self.title: str = 'Breakout Game'
+        self.clock: pygame.time.Clock = pygame.time.Clock()
 
         # Menu
-        self.main_menu = MainMenu()
-        self.pause_menu = PauseMenu()
-        self.level_menu = LevelMenu()
-        self.end_game_menu = EndGameMenu()
+        self.main_menu: MainMenu = MainMenu()
+        self.pause_menu: PauseMenu = PauseMenu()
+        self.level_menu: LevelMenu = LevelMenu()
+        self.end_game_menu: EndGameMenu = EndGameMenu()
 
         # Music
-        self.menu_music_path = path_utils.get_asset_path('sounds/menu.mp3')
-        pygame.mixer.music.load(self.menu_music_path)
+        menu_music_path: Path = path_utils.get_asset_path('sounds/menu.mp3')
+        pygame.mixer.music.load(menu_music_path)
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer.music.play(-1)
 
         # Background
-        self.background = self.main_menu.background
+        self.background: pygame.Surface = self.main_menu.background
 
         # Sprites
-        self.sprite_manager = SpriteManager()
+        self.sprite_manager: SpriteManager = SpriteManager()
 
-        # Game Stage
-        self.game_active = False
-        self.start_pause_time = 0
-        self.time_in_pause = 0
-        self.level = 0
-        self.level_difficulty = 0
-        self.keys_pressed = None
+        # Pause
+        self.game_active: bool = False
+        self.start_pause_time: [int, float] = 0
+        self.time_in_pause: [int, float] = 0
 
+        # Game stage
+        self.level: int = 0
+        self.level_difficulty: int = 0
+
+        self.keys_pressed: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
         game_logger.debug('Game Initialised')
 
     def restart_game(self):
@@ -63,7 +86,8 @@ class Game:
         self.end_game_menu = EndGameMenu()
 
         # Music
-        pygame.mixer.music.load(self.menu_music_path)
+        menu_music_path: Path = path_utils.get_asset_path('sounds/menu.mp3')
+        pygame.mixer.music.load(menu_music_path)
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer.music.play(-1)
 
@@ -83,7 +107,8 @@ class Game:
 
     def set_level_background(self):
         """
-        Set the background of the game
+        Set the background of the game. RGB(125, 125, 125) color is subtracted from the image to make it darker for
+        a better gaming experience.
         """
         background_path = path_utils.get_asset_path(f'images/background/level-{self.level}.jpg')
         self.background = pygame.image.load(background_path).convert()
@@ -99,7 +124,7 @@ class Game:
 
     def load_level_music(self):
         """
-        Load the music into the pygame.mixer and plays it
+        Load the music into the pygame.mixer and plays it.
         """
         pygame.mixer.music.unload()
         level_music_path = path_utils.get_asset_path(f'sounds/level-{self.level}.mp3')
@@ -109,7 +134,7 @@ class Game:
 
     def check_level_finish(self):
         """
-        Checks if payer has finished the level based on the amount of blocks in the game
+        Checks if payer has finished the level based on the amount of blocks in the game.
         """
         if len(self.sprite_manager.block_sprites_group.sprites()) == 0:
             self.sprite_manager.ball_sprites_group.empty()
@@ -122,7 +147,7 @@ class Game:
 
     def check_end_game(self):
         """
-        Checks player has finished the game or lost based on health and level number
+        Checks player has finished the game or lost based on health and level number.
         """
         if self.sprite_manager.player.health <= 0 or self.level > 6:
             self.game_active = False
@@ -135,11 +160,11 @@ class Game:
 
         Possible events:
 
-        1. The game window is closed -> ends the program
+        1. The game window is closed -> ends the program.
 
         2. The [q] key is pressed -> ends the program.
 
-        3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting
+        3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting.
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -188,7 +213,7 @@ class Game:
         Update the end game menu object and get objects to render.
 
         If the player has pressed [ENTER] in the end game menu, returns empty list
-        which is later checked
+        for compatability purposes.
 
         :return: List of list[pygame.Surface, pygame.Rect] or [[]]
         :rtype: list[list]
@@ -241,9 +266,9 @@ class Game:
         Draw graphics.
 
         Checks if there are any objects returned from menu. If true, renders them, if false,
-        updates the game objects
+        updates the game objects.
 
-        :param menu_objects_to_blit: List of list[pygame.Surface, pygame.Rect] or [[]] from menus
+        :param menu_objects_to_blit: List of list[pygame.Surface, pygame.Rect] or [[]] from menus.
         """
         self.display_surface.blit(source=self.background, dest=(0, 0))
         if len(menu_objects_to_blit) > 0:
