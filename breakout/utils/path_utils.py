@@ -1,6 +1,6 @@
 from pathlib import Path
 
-base_path = Path(__file__).parent
+base_path = Path(__file__).parent.parent
 
 
 def get_asset_path(relative_path: str) -> Path:

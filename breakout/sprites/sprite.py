@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import pygame
-import settings
+from breakout.config import settings
+from breakout.utils import path_utils
 import math
 import time
-import utils
 
-from powerup_manager import PowerUpManager
+from breakout.sprites.powerup_manager import PowerUpManager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -193,7 +193,7 @@ class Player(_GameSprite):
 		self.health: int = settings.MAX_PLAYER_HEALTH
 		self.speed = settings.DEFAULT_PADDLE_SPEED
 
-		lost_hp_sound_path = utils.get_asset_path('sounds/lost_hp.mp3')
+		lost_hp_sound_path = path_utils.get_asset_path('sounds/lost_hp.mp3')
 		self.lost_hp_sound: pygame.mixer.Sound = pygame.mixer.Sound(lost_hp_sound_path)
 
 	def check_screen_constraint(self):
@@ -326,7 +326,7 @@ class PowerUp(_GameSprite):
 		self.power: str = power
 		self.powerup_manager: PowerUpManager = powerup_manager
 
-		powerup_sound_path = utils.get_asset_path('sounds/get powerup.mp3')
+		powerup_sound_path = path_utils.get_asset_path('sounds/get powerup.mp3')
 		self.powerup_sound: pygame.mixer.Sound = pygame.mixer.Sound(powerup_sound_path)
 		self.powerup_sound.set_volume(0.3)
 
@@ -393,11 +393,11 @@ class Block(_GameSprite):
 		self.health = health
 		self.update_image()
 
-		hit_sound_path = utils.get_asset_path('sounds/hit blocks.mp3')
+		hit_sound_path = path_utils.get_asset_path('sounds/hit blocks.mp3')
 		self.hit_sound = pygame.mixer.Sound(hit_sound_path)
 		self.hit_sound.set_volume(0.25)
 
-		break_sound_path = utils.get_asset_path('sounds/break blocks.mp3')
+		break_sound_path = path_utils.get_asset_path('sounds/break blocks.mp3')
 		self.break_sound = pygame.mixer.Sound(break_sound_path)
 		self.break_sound.set_volume(0.75)
 
@@ -477,7 +477,7 @@ class Ball(_GameSprite):
 
 		self.time_delay_counter = 0
 
-		hit_paddle_sound_path = utils.get_asset_path('sounds/hit paddle.mp3')
+		hit_paddle_sound_path = path_utils.get_asset_path('sounds/hit paddle.mp3')
 		self.hit_paddle_sound = pygame.mixer.Sound(hit_paddle_sound_path)
 		self.active = False
 

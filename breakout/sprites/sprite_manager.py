@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import pygame
-import settings
 import random
 import math
-import utils
 
 from typing import TYPE_CHECKING
-from powerup_manager import PowerUpManager
+from breakout.config import settings
+from breakout.utils import path_utils
+from breakout.sprites.powerup_manager import PowerUpManager
 
 if not TYPE_CHECKING:
-	from sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
+	from breakout.sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
 
 
 class SpriteManager:
@@ -80,7 +80,7 @@ class SpriteManager:
 		"""
 		Initialize the scoreboard object.
 		"""
-		scoreboard_image_path = utils.get_asset_path('images/background/scoreboard.png')
+		scoreboard_image_path = path_utils.get_asset_path('images/background/scoreboard.png')
 		scoreboard_image = pygame.image.load(scoreboard_image_path).convert_alpha()
 		scoreboard_image = pygame.transform.scale(
 			surface=scoreboard_image,
@@ -120,7 +120,7 @@ class SpriteManager:
 		Args:
 			midtop (tuple): The middle top position of a heart sprite on the screen. Must be a tuple of (x, y)
 		"""
-		heart_image_path = utils.get_asset_path('images/hearts/heart_s.png')
+		heart_image_path = path_utils.get_asset_path('images/hearts/heart_s.png')
 		heart_image = pygame.image.load(heart_image_path).convert_alpha()
 		heart_image = pygame.transform.scale(
 			surface=heart_image,
@@ -197,7 +197,7 @@ class SpriteManager:
 			**kwargs_to_ball: other kwargs passed to the Ball sprite.
 		"""
 		if not ball_image:
-			ball_image_path = utils.get_asset_path('images/ball/ball.png')
+			ball_image_path = path_utils.get_asset_path('images/ball/ball.png')
 			ball_image = pygame.image.load(ball_image_path).convert_alpha()
 			ball_image = pygame.transform.scale(
 				ball_image,

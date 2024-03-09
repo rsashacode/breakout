@@ -1,10 +1,10 @@
 import pytest
 import pygame
 import math
-import settings
+from breakout import settings
 
-from sprites.sprite_manager import SpriteManager
-from sprites.sprite import Player, Score, Scoreboard, Ball, Block, Heart
+from breakout.sprites.sprite_manager import SpriteManager
+from breakout.sprites.sprite import Player, Score, Scoreboard, Ball, Block, Heart
 
 
 @pytest.fixture

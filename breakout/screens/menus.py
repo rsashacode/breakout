@@ -1,8 +1,8 @@
 import pygame
-import settings
+from breakout.config import settings
 import time
 
-from utils import get_asset_path
+from breakout.utils.path_utils import get_asset_path
 
 
 class MainMenu:

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import time
 import math
-import settings
+from breakout.config import settings
 import logging
 import pygame
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-	from sprites.sprite_manager import SpriteManager
+	from breakout.sprites.sprite_manager import SpriteManager
 
 game_logger = logging.getLogger('')
 

@@ -1,7 +1,6 @@
-import pytest
 import pygame
 
-from main import Game
+from breakout.main import Game
 
 
 def test_restart_game():
