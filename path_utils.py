@@ -1,10 +1,15 @@
-import os
 from pathlib import Path
 
 base_path = Path(__file__).parent
 
 
 def get_asset_path(relative_path: str):
+	"""
+	Get the absolute path of an asset.
+
+	:param relative_path: path of an asset in assets folder
+	:return: absolute path of an asset
+	"""
 	asset_path = base_path.joinpath('assets', relative_path)
 	if asset_path.is_file():
 		if asset_path.exists():

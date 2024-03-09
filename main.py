@@ -180,7 +180,7 @@ class Game:
         :rtype: list[list]
         """
         self.level_menu.update(self.keys_pressed)
-        objects_to_blit = [[self.end_game_menu.text_surface, self.end_game_menu.text_rect]]
+        objects_to_blit = [[self.level_menu.text_surface, self.level_menu.text_rect]]
         return objects_to_blit
 
     def get_last_end_game_menu(self) -> list[list]:

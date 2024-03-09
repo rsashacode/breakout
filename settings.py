@@ -129,7 +129,7 @@ POWERS = {
 		'conflicting-power': None
 	},
 	'big-ball': {
-		'probability': 1,
+		'probability': 0.1,
 		'path': path_utils.get_asset_path('images/powerups/big-ball.png'),
 		'time': BALL_SIZE_DURATION,
 		'conflicting-power': 'small-ball'
@@ -153,7 +153,7 @@ POWERS = {
 		'conflicting-power': 'fast-ball'
 	},
 	'multiply-balls': {
-		'probability': 1,
+		'probability': 0.1,
 		'path': path_utils.get_asset_path('images/powerups/multiply-balls.png'),
 		'time': -1,
 		'conflicting-power': None

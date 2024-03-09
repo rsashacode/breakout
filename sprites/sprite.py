@@ -36,6 +36,7 @@ class _GameSprite(pygame.sprite.Sprite):
 		self.speed = 0
 
 		self.original_image = self.image.copy()
+		self.original_rect = self.rect.copy()
 		self.original_width = self.rect.width
 		self.original_height = self.rect.height
 

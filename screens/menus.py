@@ -78,7 +78,7 @@ class EndGameMenu:
 		self.font = pygame.font.Font(settings.GAME_FONT, settings.MENU_FONT_SIZE)
 		self.text = 'END GAME. PRESS [ENTER] TO RESTART'
 
-		self.text_surface = self.font.render(self.text, True, (0, 0, 0))
+		self.text_surface = self.font.render(self.text, True, (255, 255, 255))
 		self.text_rect = self.text_surface.get_rect(
 			center=(settings.WINDOW_WIDTH // 2, settings.WINDOW_HEIGHT // 2)
 		)

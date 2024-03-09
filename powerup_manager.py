@@ -69,7 +69,7 @@ class PowerUpManager:
 		print('activating add-life')
 		self.sprite_manager.player_sprites_group.sprites()[0].add_health()
 
-	def activate_big_ball(self):
+	def activate_big_ball(self, start_timer=True):
 		print('Activating big-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 
@@ -77,9 +77,10 @@ class PowerUpManager:
 			new_height = round(ball.original_width * 1.5)
 			ball.change_size(new_width, new_height)
 
-		self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
+		if start_timer:
+			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
-	def activate_small_ball(self):
+	def activate_small_ball(self, start_timer=True):
 		print('activating small-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 
@@ -87,19 +88,24 @@ class PowerUpManager:
 			new_height = round(ball.original_height * 0.5)
 			ball.change_size(new_width, new_height)
 
-		self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
+		if start_timer:
+			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
-	def activate_fast_ball(self):
+	def activate_fast_ball(self, start_timer=True):
 		print('activating fast-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.change_speed(int(ball.speed * 2))
-		self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
+			ball.change_speed(int(ball.original_speed * 2))
 
-	def activate_slow_ball(self):
+		if start_timer:
+			self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
+
+	def activate_slow_ball(self, start_timer=True):
 		print('activating slow-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.change_speed(int(ball.speed * 0.5))
-		self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
+			ball.change_speed(int(ball.original_speed * 0.5))
+
+		if start_timer:
+			self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
 
 	def activate_multiple_balls(self):
 		print('activating multiple balls')
@@ -107,16 +113,15 @@ class PowerUpManager:
 
 		if len(balls_in_game) <= 20:
 			for ball in balls_in_game:
-				original_width = ball.rect.width
-				original_height = ball.rect.height
 
-				original_angle = ball.get_angle_of_direction()
-				left_angle = original_angle + math.radians(15)
-				right_angle = original_angle - math.radians(15)
+				left_angle = math.radians(-135)
+				right_angle = math.radians(-45)
 
 				ball_kwargs = {
 					'speed': ball.speed,
-					'original_speed': ball.speed,
+					'original_speed': ball.original_speed,
+					'original_width': ball.original_width,
+					'original_height': ball.original_height,
 					'strength': ball.strength,
 					'original_strength': ball.original_strength,
 					'active': True,
@@ -129,23 +134,24 @@ class PowerUpManager:
 				for angle in [left_angle, right_angle]:
 					self.sprite_manager.create_ball(
 						ball_image=ball.image,
-						midbottom=ball.rect.midbottom,
+						midbottom=ball.original_rect.midbottom,
 						angle_radians=angle,
 						**ball_kwargs
 					)
-				self.sprite_manager.ball_sprites_group.sprites()[-1].change_size(original_width, original_height)
+				if 'big-ball' in self.active_powerups:
+					self.activate_big_ball(start_timer=False)
+				if 'small-ball' in self.active_powerups:
+					self.activate_small_ball(start_timer=False)
 
-	def activate_super_ball(self):
+	def activate_super_ball(self, start_timer=True):
 		print('Activating super-ball')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
-			ball.change_strength(
-				int(ball.original_strength * 2)
-			)
-			self.ball_strength_timer.start(
-				settings.BALL_STRENGTH_DURATION
-			)
+			ball.change_strength(int(ball.original_strength * 2))
 
-	def activate_big_paddle(self):
+			if start_timer:
+				self.ball_strength_timer.start(settings.BALL_STRENGTH_DURATION)
+
+	def activate_big_paddle(self, start_timer=True):
 		print('Activating big-paddle')
 		for player in self.sprite_manager.player_sprites_group.sprites():
 
@@ -154,15 +160,19 @@ class PowerUpManager:
 			new_paddle_width = int(original_width * 2)
 
 			player.change_size(new_paddle_width, original_height)
+
+		if start_timer:
 			self.paddle_size_timer.start(settings.PADDLE_SIZE_DURATION)
 
-	def activate_small_paddle(self):
+	def activate_small_paddle(self, start_timer=True):
 		print('Activating small paddle')
 		for player in self.sprite_manager.player_sprites_group.sprites():
 			original_width = player.original_width
 			original_height = player.original_height
 			new_paddle_width = int(original_width * 0.5)
 			player.change_size(new_paddle_width, original_height)
+
+		if start_timer:
 			self.paddle_size_timer.start(settings.PADDLE_SIZE_DURATION)
 
 	def deactivate_paddle_size(self):
