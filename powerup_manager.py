@@ -116,6 +116,9 @@ class PowerUpManager:
 			new_height = round(ball.original_width * 1.5)
 			ball.change_size(new_width, new_height)
 
+			if 'super-ball' in self.active_powerups:
+				self.activate_super_ball(start_timer=False)
+
 		if start_timer:
 			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
@@ -131,6 +134,9 @@ class PowerUpManager:
 			new_width = round(ball.original_width * 0.5)
 			new_height = round(ball.original_height * 0.5)
 			ball.change_size(new_width, new_height)
+
+			if 'super-ball' in self.active_powerups:
+				self.activate_super_ball(start_timer=False)
 
 		if start_timer:
 			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
@@ -269,7 +275,7 @@ class PowerUpManager:
 		"""
 		Restore the strength of all balls in game
 
-		All affected balls are restored in color
+		All affected balls are restored in color.
 		:param start_timer: if true, start timer
 		"""
 		game_logger.info('Deactivating ball strength powerup')
