@@ -1,9 +1,24 @@
+from __future__ import annotations
+
 import time
 import math
 import settings
+import logging
+import pygame
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from sprites.sprite_manager import SpriteManager
+
+
+game_logger = logging.getLogger('')
 
 
 class PowerUpTimer:
+	"""
+	Simple timer. Stores and updates time passed since the activation
+	"""
 	def __init__(self):
 		self.start_time = None
 		self.current_time = None
@@ -12,6 +27,11 @@ class PowerUpTimer:
 		self.active = False
 
 	def start(self, duration: int):
+		"""
+		Start the timer
+
+		:param duration: the amount of seconds for a powerup to be active
+		"""
 		current_time = time.time()
 
 		self.start_time, self.current_time = current_time, current_time
@@ -19,6 +39,11 @@ class PowerUpTimer:
 		self.active = True
 
 	def update(self, time_in_pause: float = 0):
+		"""
+		Update timer with time passed since the activation.
+
+		:param time_in_pause: the amount of time during which the program was on pause
+		"""
 		if self.active:
 			self.start_time += time_in_pause
 			self.current_time = time.time()
@@ -29,7 +54,14 @@ class PowerUpTimer:
 
 
 class PowerUpManager:
-	def __init__(self, sprite_manager):
+	"""
+	Handles the powerups. Stores active powerups, activates and deactivates
+	them, handles powerup timers.
+	"""
+	def __init__(self, sprite_manager: SpriteManager):
+		"""
+		:param sprite_manager: instance of the SpriteManager
+		"""
 		self.sprite_manager = sprite_manager
 
 		self.trigger_methods = {
@@ -52,25 +84,32 @@ class PowerUpManager:
 		self.paddle_size_timer = PowerUpTimer()
 
 	def activate_powerup(self, power: str):
+		"""
+		Activate powerup attached to the power name provided in input.
+
+		:param power: The name of power. Available names are listed in settings.
+		"""
 		try:
 			self.trigger_methods[power]()
 			if power not in ['add-life', 'multiply-balls']:
 				self.active_powerups.append(power)
 		except KeyError as e:
-			print('Unknown power! Skip activating', str(e))
-
-	def deactivate_powerup(self, power: str):
-		try:
-			self.trigger_methods[power]()
-		except KeyError as e:
-			print('Unknown power! Skip deactivating', str(e))
+			game_logger.error('Unknown power! Skip activating', str(e))
 
 	def activate_add_life(self):
-		print('activating add-life')
+		"""
+		Add life to the player
+		"""
+		game_logger.info('Activating add-life powerup')
 		self.sprite_manager.player_sprites_group.sprites()[0].add_health()
 
-	def activate_big_ball(self, start_timer=True):
-		print('Activating big-ball')
+	def activate_big_ball(self, start_timer: bool = True):
+		"""
+		Increase the size of all balls in game with the factor of 1.5 to the original size
+
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating big-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 
 			new_width = round(ball.original_width * 1.5)
@@ -80,8 +119,13 @@ class PowerUpManager:
 		if start_timer:
 			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
-	def activate_small_ball(self, start_timer=True):
-		print('activating small-ball')
+	def activate_small_ball(self, start_timer: bool = True):
+		"""
+		Decrease the size of all balls in game with the factor of 0.5 to the original size
+
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating small-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 
 			new_width = round(ball.original_width * 0.5)
@@ -91,8 +135,13 @@ class PowerUpManager:
 		if start_timer:
 			self.ball_size_timer.start(settings.BALL_SIZE_DURATION)
 
-	def activate_fast_ball(self, start_timer=True):
-		print('activating fast-ball')
+	def activate_fast_ball(self, start_timer: bool = True):
+		"""
+		Increase the speed of all balls in game with the factor of 2 to the original speed
+
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating fast-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.change_speed(int(ball.original_speed * 2))
 
@@ -100,7 +149,12 @@ class PowerUpManager:
 			self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
 
 	def activate_slow_ball(self, start_timer=True):
-		print('activating slow-ball')
+		"""
+		Decrease the speed of all balls in game with the factor of 0.5 to the original speed
+
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating slow-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.change_speed(int(ball.original_speed * 0.5))
 
@@ -108,7 +162,13 @@ class PowerUpManager:
 			self.ball_speed_timer.start(settings.BALL_SPEED_DURATION)
 
 	def activate_multiple_balls(self):
-		print('activating multiple balls')
+		"""
+		Multiply balls in game x3. Each new ball has the same state as the original one.
+
+		The first ball created has a direction of -135 degrees to the x-axis
+		The second ball created has a direction of -45 degrees to the x-axis
+		"""
+		game_logger.info('Activating multiply-balls powerup')
 		balls_in_game = self.sprite_manager.ball_sprites_group.sprites()
 
 		if len(balls_in_game) <= 20:
@@ -144,10 +204,16 @@ class PowerUpManager:
 					self.activate_small_ball(start_timer=False)
 
 	def activate_super_ball(self, start_timer=True):
-		print('Activating super-ball')
+		"""
+		Increase the strength of all balls in game with the factor of 2 to the original strength
+
+		All affected balls are + 125 red in color
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Activating super-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.change_strength(int(ball.original_strength * 2))
-
+			ball.image.fill((125, 0, 0), special_flags=pygame.BLEND_RGB_ADD)
 			if start_timer:
 				self.ball_strength_timer.start(settings.BALL_STRENGTH_DURATION)
 
@@ -200,9 +266,20 @@ class PowerUpManager:
 				self.active_powerups.remove(power)
 
 	def deactivate_ball_strength(self):
-		print('Deactivating ball strength powerup')
+		"""
+		Restore the strength of all balls in game
+
+		All affected balls are restored in color
+		:param start_timer: if true, start timer
+		"""
+		game_logger.info('Deactivating ball strength powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
 			ball.restore_strength()
+			ball.restore_image()
+			if 'big-ball' in self.active_powerups:
+				self.activate_big_ball(start_timer=False)
+			if 'small-ball' in self.active_powerups:
+				self.activate_small_ball(start_timer=False)
 		if 'super-ball' in self.active_powerups:
 			self.active_powerups.remove('super-ball')
 

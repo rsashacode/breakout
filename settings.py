@@ -159,7 +159,7 @@ POWERS = {
 		'conflicting-power': None
 	},
 	'super-ball': {
-		'probability': 0.1,
+		'probability': 1,
 		'path': path_utils.get_asset_path('images/powerups/super-ball.png'),
 		'time': BALL_STRENGTH_DURATION,
 		'conflicting-power': None

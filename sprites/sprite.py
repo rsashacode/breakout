@@ -81,7 +81,7 @@ class _GameSprite(pygame.sprite.Sprite):
 
 	def restore_image(self):
 		rect_center = self.rect.center
-		self.image = copy.deepcopy(self.original_image)
+		self.image = self.original_image.copy()
 		self.rect = self.image.get_rect(center=rect_center)
 		self.update_position_from_rect()
 
