@@ -14,6 +14,11 @@ game_logger = logging.getLogger('')
 
 
 class Game:
+    """
+    The main game class.
+
+    Handles all the updates and drawing of the objects, menus and screens.
+    """
     def __init__(self):
         # General Setup
         pygame.init()
@@ -47,7 +52,12 @@ class Game:
         self.level_difficulty = 0
         self.keys_pressed = None
 
+        game_logger.debug('Game Initialised')
+
     def restart_game(self):
+        """
+        Reinitialize the game objects and start the game from scratch
+        """
         # Menu
         self.main_menu = MainMenu()
         self.end_game_menu = EndGameMenu()
@@ -69,8 +79,12 @@ class Game:
         self.keys_pressed = None
 
         self.sprite_manager = SpriteManager()
+        game_logger.info('Game restarted')
 
     def set_level_background(self):
+        """
+        Set the background of the game
+        """
         background_path = path_utils.get_asset_path(f'images/background/level-{self.level}.jpg')
         self.background = pygame.image.load(background_path).convert()
         self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)
@@ -81,14 +95,22 @@ class Game:
         scaled_width = self.background.get_width() * scale_factor
         scaled_height = self.background.get_height() * scale_factor
         self.background = pygame.transform.scale(self.background, (scaled_width, scaled_height))
+        game_logger.debug(f'Background {background_path} of level {self.level} is set')
 
     def load_level_music(self):
+        """
+        Load the music into the pygame.mixer and plays it
+        """
         pygame.mixer.music.unload()
         level_music_path = path_utils.get_asset_path(f'sounds/level-{self.level}.mp3')
         pygame.mixer.music.load(level_music_path)
         pygame.mixer.music.play(fade_ms=1000)
+        game_logger.debug(f'Music {level_music_path} of level {self.level} started')
 
     def check_level_finish(self):
+        """
+        Checks if payer has finished the level based on the amount of blocks in the game
+        """
         if len(self.sprite_manager.block_sprites_group.sprites()) == 0:
             self.sprite_manager.ball_sprites_group.empty()
             self.sprite_manager.power_up_sprites_group.empty()
@@ -96,15 +118,32 @@ class Game:
             self.game_active = False
             self.level_menu.active = True
             self.level += 1
+            game_logger.info(f'The level {self.level} is finished')
 
     def check_end_game(self):
+        """
+        Checks player has finished the game or lost based on health and level number
+        """
         if self.sprite_manager.player.health <= 0 or self.level > 6:
             self.game_active = False
             self.end_game_menu.active = True
+            game_logger.debug(f'The game has ended')
 
     def check_events(self):
+        """
+        Handles the events based on key pressed during the game.
+
+        Possible events:
+
+        1. The game window is closed -> ends the program
+
+        2. The [q] key is pressed -> ends the program.
+
+        3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                game_logger.info(f'The game window is closed. Exiting...')
                 pygame.quit()
                 sys.exit()
 
@@ -112,11 +151,19 @@ class Game:
         if self.keys_pressed[pygame.K_ESCAPE] and self.game_active:
             self.pause_menu.active = True
             self.start_pause_time = time.time()
+            game_logger.info(f'Pause activated')
         elif self.keys_pressed[pygame.K_q]:
+            game_logger.info(f'The [q] button is pressed. Exiting...')
             pygame.quit()
             sys.exit()
 
     def get_last_blit_main_menu(self) -> list[list]:
+        """
+        Update the main menu object and get objects to render.
+
+        :return: List of list[pygame.Surface, pygame.Rect]
+        :rtype: list[list]
+        """
         self.main_menu.update(self.keys_pressed)
         self.level_difficulty = self.main_menu.selected_option
         self.display_surface.blit(self.main_menu.title_surface, self.main_menu.title_rect)
@@ -126,11 +173,26 @@ class Game:
         return objects_to_blit
 
     def get_last_level_menu(self) -> list[list]:
+        """
+        Update the level menu object and get objects to render.
+
+        :return: List of list[pygame.Surface, pygame.Rect]
+        :rtype: list[list]
+        """
         self.level_menu.update(self.keys_pressed)
         objects_to_blit = [[self.end_game_menu.text_surface, self.end_game_menu.text_rect]]
         return objects_to_blit
 
     def get_last_end_game_menu(self) -> list[list]:
+        """
+        Update the end game menu object and get objects to render.
+
+        If the player has pressed [ENTER] in the end game menu, returns empty list
+        which is later checked
+
+        :return: List of list[pygame.Surface, pygame.Rect] or [[]]
+        :rtype: list[list]
+        """
         self.end_game_menu.update(self.keys_pressed, self.sprite_manager.score.score)
         if self.end_game_menu.restart_needed:
             self.restart_game()
@@ -139,18 +201,32 @@ class Game:
         return objects_to_blit
 
     def get_last_blit_pause_menu(self) -> list[list]:
+        """
+        Update the pause menu object and get objects to render.
+
+        :return: List of list[pygame.Surface, pygame.Rect]
+        :rtype: list[list]
+        """
         self.pause_menu.update(self.keys_pressed)
         objects_to_blit = [[self.pause_menu.text_surface, self.pause_menu.text_rect]]
         return objects_to_blit
 
     def init_game_stage(self):
+        """
+        Initialize the stage of level and start the game.
+        """
         self.set_level_background()
-        self.load_level_music()
         self.sprite_manager.init_level(self.level, self.level_difficulty)
         self.load_level_music()
         self.game_active = True
+        game_logger.info(f'Stage of level {self.level} initialized')
 
     def run_game(self, delta_time: float):
+        """
+        Runs the game. Updates all objects.
+
+        :param delta_time: time passed since the last update
+        """
         self.check_level_finish()
         self.check_end_game()
         self.sprite_manager.update(delta_time, self.keys_pressed, self.time_in_pause)
@@ -161,6 +237,14 @@ class Game:
             self,
             menu_objects_to_blit: list[list[pygame.Surface, pygame.Rect]]
     ):
+        """
+        Draw graphics.
+
+        Checks if there are any objects returned from menu. If true, renders them, if false,
+        updates the game objects
+
+        :param menu_objects_to_blit: List of list[pygame.Surface, pygame.Rect] or [[]] from menus
+        """
         self.display_surface.blit(source=self.background, dest=(0, 0))
         if len(menu_objects_to_blit) > 0:
             for menu_object_to_blit in menu_objects_to_blit:
@@ -172,10 +256,12 @@ class Game:
         pygame.display.update()
 
     def run(self):
+        """
+        THe main event loop.
+        """
         while True:
             delta_time = self.clock.tick_busy_loop(settings.FPS) / 1000
 
-            # Event handling
             self.check_events()
 
             # Handle Menus
