@@ -29,11 +29,13 @@ class Game:
         level_menu (LevelMenu): Level menu object.
         end_game_menu (EndGameMenu): End game menu object.
         background (pygame.Surface): The background of the game.
-        sprite_manager (SpriteManager): The sprite manager object handling the behaviour of all sprites in the game.
+        sprite_manager (SpriteManager):
+            The sprite manager object handling the behaviour of all sprites in the game.
         game_active (bool): Whether the game is active or not. Defaults to False.
         start_pause_time (int, float): The time when the game was set on pause. Defaults to 0.
         time_in_pause (int, float): The amount of time spent in pause. Defaults to 0.
-        level (int): The level of the game. Defaults to 0. Must be a number from 0 to 6.
+        level (int):
+            The level of the game. Defaults to 0. Must be a number from 0 to 6.
         level_difficulty (int): The difficulty of the game. Defaults to 0. Must be a number from 0 to 2.
         keys_pressed (pygame.key.ScancodeWrapper): The keys pressed during the game.
 

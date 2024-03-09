@@ -226,9 +226,10 @@ class Player(_GameSprite):
 		"""
 		if self.health < settings.MAX_PLAYER_HEALTH:
 			self.health += 1
+			heart_horizontal_gap = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
 
 			heart_midtop = (
-				settings.GAME_WINDOW_WIDTH + self.health * self.sprite_manager.heart_horizontal_gap,
+				settings.GAME_WINDOW_WIDTH + self.health * heart_horizontal_gap,
 				settings.GAME_WINDOW_HEIGHT // 7
 			)
 			self.sprite_manager.create_heart(midtop=heart_midtop)
