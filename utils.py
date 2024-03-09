@@ -7,8 +7,14 @@ def get_asset_path(relative_path: str):
 	"""
 	Get the absolute path of an asset.
 
-	:param relative_path: path of an asset in assets folder
-	:return: absolute path of an asset
+	Note:
+		The relative path must be relative to the asset directory. For example: "images/background/background.png"
+
+	Args:
+		relative_path (pathlib.Path): Path of an asset in assets folder.
+
+	Returns:
+		str: An absolute path of an asset provided.
 	"""
 	asset_path = base_path.joinpath('assets', relative_path)
 	if asset_path.is_file():

@@ -18,14 +18,13 @@ class PowerUpTimer:
 	"""
 	Simple timer. Stores and updates time passed since the activation
 
-		Attributes:
+	Attributes:
+		start_time (None, float, int): The starting time of the timer. Defaults to None.
+		current_time (None, float, int): The current time of the timer. Defaults to None.
+		duration (None, float, int): Duration of timer set. Defaults to None.
+		active (bool): If the timer is active. Defaults to False.
 
-		- start_time (None, float, int): The starting time of the timer. Defaults to None.
-		- current_time (None, float, int): The current time of the timer. Defaults to None.
-		- duration (None, float, int): Duration of timer set. Defaults to None.
-		- active (bool): If the timer is active. Defaults to False.
-
-		version: 1
+	version: 1
 	"""
 
 	def __init__(self):
@@ -39,7 +38,8 @@ class PowerUpTimer:
 		"""
 		Start the timer
 
-		:param duration: the amount of seconds for a powerup to be active
+		Args:
+			duration (int): The amount of seconds for a powerup to be active.
 		"""
 		current_time = time.time()
 
@@ -51,7 +51,8 @@ class PowerUpTimer:
 		"""
 		Update timer with time passed since the activation.
 
-		:param time_in_pause: the amount of time during which the program was on pause
+		Args:
+			time_in_pause (float): The amount of time during which the program was on pause. Default is 0.
 		"""
 		if self.active:
 			self.start_time += time_in_pause
@@ -66,12 +67,11 @@ class PowerUpManager:
 	"""
 	Handles the powerups. Stores active powerups, activates and deactivates
 	them, handles powerup timers.
-	"""
 
+	Args:
+		sprite_manager
+	"""
 	def __init__(self, sprite_manager: SpriteManager):
-		"""
-		:param sprite_manager: instance of the SpriteManager
-		"""
 		self.sprite_manager = sprite_manager
 
 		self.trigger_methods = {
@@ -97,7 +97,8 @@ class PowerUpManager:
 		"""
 		Activate powerup attached to the power name provided in input.
 
-		:param power: The name of power. Available names are listed in settings.
+		Args:
+			power (str): The name of power. Available names are listed in settings.
 		"""
 		try:
 			self.trigger_methods[power]()
@@ -117,7 +118,8 @@ class PowerUpManager:
 		"""
 		Increase the size of all balls in game by a factor of 1.5 to the original size
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating big-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -137,7 +139,8 @@ class PowerUpManager:
 		"""
 		Decrease the size of all balls in game by a factor of 0.5 to the original size
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating small-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -157,7 +160,8 @@ class PowerUpManager:
 		"""
 		Increase the speed of all balls in game by a factor of 2 to the original speed
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating fast-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -170,7 +174,8 @@ class PowerUpManager:
 		"""
 		Decrease the speed of all balls in game by a factor of 0.5 to the original speed
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating slow-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -229,8 +234,11 @@ class PowerUpManager:
 		"""
 		Increase the strength of all balls in game by a factor of 2 to the original strength
 
-		All affected balls are + 125 red in color.
-		:param start_timer: if true, start timer
+		Note:
+			All affected balls are + 125 red.
+
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating super-ball powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -243,7 +251,8 @@ class PowerUpManager:
 		"""
 		Increase the length of the paddle by a factor of 2 to the original length.
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating big-paddle powerup')
 		for player in self.sprite_manager.player_sprites_group.sprites():
@@ -260,7 +269,8 @@ class PowerUpManager:
 		"""
 		Decrease the length of the paddle by a factor of 0.5 to the original length.
 
-		:param start_timer: if true, start timer
+		Args:
+			start_timer (bool): if true, start timer. Defaults to True.
 		"""
 		game_logger.info('Activating small paddle')
 		for player in self.sprite_manager.player_sprites_group.sprites():
@@ -309,7 +319,8 @@ class PowerUpManager:
 		"""
 		Restore the strength of all balls in game
 
-		All affected balls are restored in color.
+		Note:
+			All affected balls are restored in color.
 		"""
 		game_logger.info('Deactivating ball strength powerup')
 		for ball in self.sprite_manager.ball_sprites_group.sprites():
@@ -326,7 +337,8 @@ class PowerUpManager:
 		"""
 		Update timers according to the duration of powerups, deactivate powerups if needed.
 
-		:param time_in_pause: time spent in pause to correct timers
+		Args:
+			time_in_pause (float): time spent in pause to correct timers. Defaults to 0.
 		"""
 		if self.paddle_size_timer.active:
 			self.paddle_size_timer.update(time_in_pause)

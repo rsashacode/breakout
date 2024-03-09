@@ -2,7 +2,7 @@ import pygame
 import settings
 import time
 
-from path_utils import get_asset_path
+from utils import get_asset_path
 
 
 class MainMenu:

@@ -3,7 +3,7 @@ import pygame
 import settings
 import sys
 import time
-import path_utils
+import utils
 
 from log import logger
 from pathlib import Path
@@ -20,25 +20,24 @@ class Game:
 
     Handles all the updates and drawing of the objects, menus and screens.
 
-        Attributes:
+    Attributes:
+        display_surface (pygame.Surface): Main screen surface on which everything is displayed.
+        title (str): The name displayed at the top of the screen. Defaults to "Breakout Game"
+        clock (pygame.time.Clock): Timer to run the game at persistent time rate.
+        main_menu (MainMenu): Main menu object.
+        pause_menu (PauseMenu): Pause menu object.
+        level_menu (LevelMenu): Level menu object.
+        end_game_menu (EndGameMenu): End game menu object.
+        background (pygame.Surface): The background of the game.
+        sprite_manager (SpriteManager): The sprite manager object handling the behaviour of all sprites in the game.
+        game_active (bool): Whether the game is active or not. Defaults to False.
+        start_pause_time (int, float): The time when the game was set on pause. Defaults to 0.
+        time_in_pause (int, float): The amount of time spent in pause. Defaults to 0.
+        level (int): The level of the game. Defaults to 0. Must be a number from 0 to 6.
+        level_difficulty (int): The difficulty of the game. Defaults to 0. Must be a number from 0 to 2.
+        keys_pressed (pygame.key.ScancodeWrapper): The keys pressed during the game.
 
-        - display_surface (pygame.Surface): Main screen surface on which everything is displayed.
-        - title (str): The name displayed at the top of the screen. Defaults to "Breakout Game"
-        - clock (pygame.time.Clock): Timer to run the game at persistent time rate.
-        - main_menu (MainMenu): Main menu object.
-        - pause_menu (PauseMenu): Pause menu object.
-        - level_menu (LevelMenu): Level menu object.
-        - end_game_menu (EndGameMenu): End game menu object.
-        - background (pygame.Surface): The background of the game.
-        - sprite_manager (SpriteManager): The sprite manager object handling the behaviour of all sprites in the game.
-        - game_active (bool): Whether the game is active or not. Defaults to False.
-        - start_pause_time (int, float): The time when the game was set on pause. Defaults to 0.
-        - time_in_pause (int, float): The amount of time spent in pause. Defaults to 0.
-        - level (int): The level of the game. Defaults to 0. Must be a number from 0 to 6.
-        - level_difficulty (int): The difficulty of the game. Defaults to 0. Must be a number from 0 to 2.
-        - keys_pressed (pygame.key.ScancodeWrapper): The keys pressed during the game.
-
-        version: 1
+    version: 1
     """
     def __init__(self):
         # General Setup
@@ -54,7 +53,7 @@ class Game:
         self.end_game_menu: EndGameMenu = EndGameMenu()
 
         # Music
-        menu_music_path: Path = path_utils.get_asset_path('sounds/menu.mp3')
+        menu_music_path: Path = utils.get_asset_path('sounds/menu.mp3')
         pygame.mixer.music.load(menu_music_path)
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer.music.play(-1)
@@ -86,7 +85,7 @@ class Game:
         self.end_game_menu = EndGameMenu()
 
         # Music
-        menu_music_path: Path = path_utils.get_asset_path('sounds/menu.mp3')
+        menu_music_path: Path = utils.get_asset_path('sounds/menu.mp3')
         pygame.mixer.music.load(menu_music_path)
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer.music.play(-1)
@@ -110,7 +109,7 @@ class Game:
         Set the background of the game. RGB(125, 125, 125) color is subtracted from the image to make it darker for
         a better gaming experience.
         """
-        background_path = path_utils.get_asset_path(f'images/background/level-{self.level}.jpg')
+        background_path = utils.get_asset_path(f'images/background/level-{self.level}.jpg')
         self.background = pygame.image.load(background_path).convert()
         self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)
         scale_factor = max([
@@ -127,7 +126,7 @@ class Game:
         Load the music into the pygame.mixer and plays it.
         """
         pygame.mixer.music.unload()
-        level_music_path = path_utils.get_asset_path(f'sounds/level-{self.level}.mp3')
+        level_music_path = utils.get_asset_path(f'sounds/level-{self.level}.mp3')
         pygame.mixer.music.load(level_music_path)
         pygame.mixer.music.play(fade_ms=1000)
         game_logger.debug(f'Music {level_music_path} of level {self.level} started')
@@ -158,13 +157,12 @@ class Game:
         """
         Handles the events based on key pressed during the game.
 
-        Possible events:
+        Note:
+            Possible events:
 
-        1. The game window is closed -> ends the program.
-
-        2. The [q] key is pressed -> ends the program.
-
-        3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting.
+            1. The game window is closed -> ends the program.
+            2. The [q] key is pressed -> ends the program.
+            3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting.
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -186,8 +184,8 @@ class Game:
         """
         Update the main menu object and get objects to render.
 
-        :return: List of list[pygame.Surface, pygame.Rect]
-        :rtype: list[list]
+        Returns:
+            list[list[pygame.Surface, pygame.Rect]]: Objects to use to render the main menu
         """
         self.main_menu.update(self.keys_pressed)
         self.level_difficulty = self.main_menu.selected_option
@@ -201,8 +199,8 @@ class Game:
         """
         Update the level menu object and get objects to render.
 
-        :return: List of list[pygame.Surface, pygame.Rect]
-        :rtype: list[list]
+        Returns:
+            list[list[pygame.Surface, pygame.Rect]]: Objects to use to render the level menu
         """
         self.level_menu.update(self.keys_pressed)
         objects_to_blit = [[self.level_menu.text_surface, self.level_menu.text_rect]]
@@ -212,11 +210,12 @@ class Game:
         """
         Update the end game menu object and get objects to render.
 
-        If the player has pressed [ENTER] in the end game menu, returns empty list
-        for compatability purposes.
+        Note:
+            If the player has pressed [ENTER] in the end game menu, returns empty list
+            for compatability purposes.
 
-        :return: List of list[pygame.Surface, pygame.Rect] or [[]]
-        :rtype: list[list]
+        Returns:
+            list[list[pygame.Surface, pygame.Rect]]: Objects to use to render the end game menu
         """
         self.end_game_menu.update(self.keys_pressed, self.sprite_manager.score.score)
         if self.end_game_menu.restart_needed:
@@ -229,8 +228,8 @@ class Game:
         """
         Update the pause menu object and get objects to render.
 
-        :return: List of list[pygame.Surface, pygame.Rect]
-        :rtype: list[list]
+        Returns:
+            list[list[pygame.Surface, pygame.Rect]]: Objects to use to render the pause game menu
         """
         self.pause_menu.update(self.keys_pressed)
         objects_to_blit = [[self.pause_menu.text_surface, self.pause_menu.text_rect]]
@@ -250,7 +249,8 @@ class Game:
         """
         Runs the game. Updates all objects.
 
-        :param delta_time: time passed since the last update
+        Args:
+            delta_time (float): time passed since the last update
         """
         self.check_level_finish()
         self.check_end_game()
@@ -268,7 +268,8 @@ class Game:
         Checks if there are any objects returned from menu. If true, renders them, if false,
         updates the game objects.
 
-        :param menu_objects_to_blit: List of list[pygame.Surface, pygame.Rect] or [[]] from menus.
+        Args:
+            menu_objects_to_blit (list[list[pygame.Surface, pygame.Rect]]): Objects passed to blit method.
         """
         self.display_surface.blit(source=self.background, dest=(0, 0))
         if len(menu_objects_to_blit) > 0:
@@ -282,7 +283,7 @@ class Game:
 
     def run(self):
         """
-        THe main event loop.
+        The main event loop.
         """
         while True:
             delta_time = self.clock.tick_busy_loop(settings.FPS) / 1000

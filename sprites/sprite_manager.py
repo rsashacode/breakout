@@ -4,7 +4,7 @@ import pygame
 import settings
 import random
 import math
-import path_utils
+import utils
 
 from typing import TYPE_CHECKING
 from powerup_manager import PowerUpManager
@@ -14,8 +14,8 @@ if not TYPE_CHECKING:
 
 
 class SpriteManager:
-	def __init__(self):
 
+	def __init__(self):
 		# Sprites groups
 		(
 			self.all_sprites_group,
@@ -29,22 +29,22 @@ class SpriteManager:
 			self.power_up_timer_info_group
 		) = (pygame.sprite.Group() for _ in range(9))
 
-		self.scoreboard = None
-		self.score = None
-		self.hearts = []
-		self.blocks = []
-		self.player = None
-		self.balls = []
-		self.power_ups = []
-		self.power_up_infos = []
+		self.scoreboard: (None, Scoreboard) = None
+		self.score: (Score, Scoreboard) = None
+		self.hearts: (list, list[Heart]) = []
+		self.blocks: (list, list[Block]) = []
+		self.player: (None, Player) = None
+		self.balls: (list, list[Ball]) = []
+		self.power_ups: (list, list[PowerUp]) = []
+		self.power_up_infos: (list, list[PowerUpTimerInfo]) = []
 
-		self.powerup_manager = PowerUpManager(self)
-		self.heart_horizontal_gap = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
+		self.powerup_manager: PowerUpManager = PowerUpManager(self)
+		self.heart_horizontal_gap: int = settings.SCOREBOARD_WIDTH // (settings.MAX_PLAYER_HEALTH + 1)
 
-		self.level_difficulty = None
+		self.level_difficulty: (None, int) = None
 
 	def create_scoreboard(self):
-		scoreboard_image_path = path_utils.get_asset_path('images/background/scoreboard.png')
+		scoreboard_image_path = utils.get_asset_path('images/background/scoreboard.png')
 		scoreboard_image = pygame.image.load(scoreboard_image_path).convert_alpha()
 		scoreboard_image = pygame.transform.scale(
 			surface=scoreboard_image,
@@ -75,7 +75,7 @@ class SpriteManager:
 		)
 
 	def create_heart(self, midtop: tuple):
-		heart_image_path = path_utils.get_asset_path('images/hearts/heart_s.png')
+		heart_image_path = utils.get_asset_path('images/hearts/heart_s.png')
 		heart_image = pygame.image.load(heart_image_path).convert_alpha()
 		heart_image = pygame.transform.scale(
 			surface=heart_image,
@@ -128,7 +128,7 @@ class SpriteManager:
 			**kwargs_to_ball
 	):
 		if not ball_image:
-			ball_image_path = path_utils.get_asset_path('images/ball/ball.png')
+			ball_image_path = utils.get_asset_path('images/ball/ball.png')
 			ball_image = pygame.image.load(ball_image_path).convert_alpha()
 			ball_image = pygame.transform.scale(
 				ball_image,

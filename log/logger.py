@@ -2,7 +2,7 @@ import logging
 import logging.config
 
 from pathlib import Path
-from path_utils import base_path
+from utils import base_path
 from logging import LogRecord
 
 logging.config.dictConfig({'version': 1, 'disable_existing_loggers': True})
