@@ -1,1 +1,1 @@
-from .sprite import Heart, Player, Score, PowerUp, Block, Ball, Scoreboard, PowerUpTimerInfo
+from .sprite_manager import SpriteManager

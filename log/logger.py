@@ -1,15 +1,14 @@
 import logging
 import logging.config
 
-from pathlib import Path
 from utils import base_path
 from logging import LogRecord
 
 logging.config.dictConfig({'version': 1, 'disable_existing_loggers': True})
-log_file_path = base_path.joinpath('log', 'breakout.log')
+_log_file_path = base_path.joinpath('log', 'breakout.log')
 
 
-class FileHandler(logging.Handler):
+class _FileHandler(logging.Handler):
     """
     Log to file handler
     """
@@ -24,11 +23,11 @@ class FileHandler(logging.Handler):
         :return:
         """
         message = self.format(record)
-        with open(log_file_path, 'a') as file:
+        with open(_log_file_path, 'a') as file:
             file.write(message + '\n')
 
 
-logger_config = dict(
+_logger_config = dict(
     version=1,
     disable_existing_loggers=False,
     formatters=dict(
@@ -50,7 +49,7 @@ logger_config = dict(
     ),
     handlers=dict(
         file_handler={
-            '()': FileHandler,
+            '()': _FileHandler,
             'level': 'DEBUG',
             'formatter': 'file_formatter'
         },
@@ -68,6 +67,7 @@ logger_config = dict(
     }
 )
 
-logging.config.dictConfig(logger_config)
+logging.config.dictConfig(_logger_config)
+
 game_logger = logging.getLogger('')
 game_logger.info('Game logger configured')
