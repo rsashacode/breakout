@@ -4,48 +4,48 @@ from breakout.utils import path_utils
 
 # Available screen resolutions in the game. Font sizes are tested.
 RESOLUTIONS = {
-	'800x600': {
-		'window-width': 800,
-		'window-height': 600,
-		'menu-font-size': 20,
-		'score-font-size': 16,
-		'powerup-font-size': 8
-	},
-	'1280x720': {
-		'window-width': 1280,
-		'window-height': 720,
-		'menu-font-size': 30,
-		'score-font-size': 26,
-		'powerup-font-size': 12
-	},
-	'1366x768': {
-		'window-width': 1366,
-		'window-height': 768,
-		'menu-font-size': 34,
-		'score-font-size': 30,
-		'powerup-font-size': 13
-	},
-	'1600x900': {
-		'window-width': 1600,
-		'window-height': 900,
-		'menu-font-size': 40,
-		'score-font-size': 34,
-		'powerup-font-size': 16
-	},
-	'1920x1080': {
-		'window-width': 1920,
-		'window-height': 1080,
-		'menu-font-size': 50,
-		'score-font-size': 46,
-		'powerup-font-size': 20
-	},
-	'2560x1440': {
-		'window-width': 2560,
-		'window-height': 1440,
-		'menu-font-size': 60,
-		'score-font-size': 50,
-		'powerup-font-size': 24
-	},
+    '800x600': {
+        'window-width': 800,
+        'window-height': 600,
+        'menu-font-size': 20,
+        'score-font-size': 16,
+        'powerup-font-size': 8
+    },
+    '1280x720': {
+        'window-width': 1280,
+        'window-height': 720,
+        'menu-font-size': 30,
+        'score-font-size': 26,
+        'powerup-font-size': 12
+    },
+    '1366x768': {
+        'window-width': 1366,
+        'window-height': 768,
+        'menu-font-size': 34,
+        'score-font-size': 30,
+        'powerup-font-size': 13
+    },
+    '1600x900': {
+        'window-width': 1600,
+        'window-height': 900,
+        'menu-font-size': 40,
+        'score-font-size': 34,
+        'powerup-font-size': 16
+    },
+    '1920x1080': {
+        'window-width': 1920,
+        'window-height': 1080,
+        'menu-font-size': 50,
+        'score-font-size': 46,
+        'powerup-font-size': 20
+    },
+    '2560x1440': {
+        'window-width': 2560,
+        'window-height': 1440,
+        'menu-font-size': 60,
+        'score-font-size': 50,
+        'powerup-font-size': 24
+    },
 }
 
 # Change this if needed:
@@ -86,32 +86,32 @@ DEFAULT_POWERUP_SPEED = DEFAULT_POWERUP_SPEED_PER_BASE * SPEED_COEFFICIENT
 # Each number represent the health of a block.
 # The number range is [1, 7]. Whitespace - no block in position.
 BLOCK_MAP = [
-	'          ',
-	'1111111111',
-	'1111111111',
-	'1111111111',
-	'1111111111',
-	'1111111111',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          ',
-	'          '
+    '          ',
+    '1111111111',
+    '1111111111',
+    '1111111111',
+    '1111111111',
+    '1111111111',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          ',
+    '          '
 ]
 
 COLOR_LEGEND = {
-	1: path_utils.get_asset_path('images/blocks/1.png'),
-	2: path_utils.get_asset_path('images/blocks/2.png'),
-	3: path_utils.get_asset_path('images/blocks/3.png'),
-	4: path_utils.get_asset_path('images/blocks/4.png'),
-	5: path_utils.get_asset_path('images/blocks/5.png'),
-	6: path_utils.get_asset_path('images/blocks/6.png'),
-	7: path_utils.get_asset_path('images/blocks/7.png')
+    1: path_utils.get_asset_path('images/blocks/1.png'),
+    2: path_utils.get_asset_path('images/blocks/2.png'),
+    3: path_utils.get_asset_path('images/blocks/3.png'),
+    4: path_utils.get_asset_path('images/blocks/4.png'),
+    5: path_utils.get_asset_path('images/blocks/5.png'),
+    6: path_utils.get_asset_path('images/blocks/6.png'),
+    7: path_utils.get_asset_path('images/blocks/7.png')
 }
 
 GAP_SIZE_COEFFICIENT = (WINDOW_WIDTH / 1366 + WINDOW_HEIGHT / 768) / 2
@@ -128,60 +128,60 @@ BALL_STRENGTH_DURATION = 20
 PADDLE_SIZE_DURATION = 15
 
 POWERS = {
-	'add-life': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/add-life.png'),
-		'time': -1,
-		'conflicting-power': None
-	},
-	'big-ball': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/big-ball.png'),
-		'time': BALL_SIZE_DURATION,
-		'conflicting-power': 'small-ball'
-	},
-	'small-ball': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/small-ball.png'),
-		'time': BALL_SIZE_DURATION,
-		'conflicting-power': 'big-ball'
-	},
-	'fast-ball': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/fast-ball.png'),
-		'time': BALL_SPEED_DURATION,
-		'conflicting-power': 'slow-ball'
-	},
-	'slow-ball': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/slow-ball.png'),
-		'time': BALL_SPEED_DURATION,
-		'conflicting-power': 'fast-ball'
-	},
-	'multiply-balls': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/multiply-balls.png'),
-		'time': -1,
-		'conflicting-power': None
-	},
-	'super-ball': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/super-ball.png'),
-		'time': BALL_STRENGTH_DURATION,
-		'conflicting-power': None
-	},
-	'big-paddle': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/big-paddle.png'),
-		'time': PADDLE_SIZE_DURATION,
-		'conflicting-power': 'small-paddle'
-	},
-	'small-paddle': {
-		'probability': 0.1,
-		'path': path_utils.get_asset_path('images/powerups/small-paddle.png'),
-		'time': PADDLE_SIZE_DURATION,
-		'conflicting-power': 'big-paddle'
-	},
+    'add-life': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/add-life.png'),
+        'time': -1,
+        'conflicting-power': None
+    },
+    'big-ball': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/big-ball.png'),
+        'time': BALL_SIZE_DURATION,
+        'conflicting-power': 'small-ball'
+    },
+    'small-ball': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/small-ball.png'),
+        'time': BALL_SIZE_DURATION,
+        'conflicting-power': 'big-ball'
+    },
+    'fast-ball': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/fast-ball.png'),
+        'time': BALL_SPEED_DURATION,
+        'conflicting-power': 'slow-ball'
+    },
+    'slow-ball': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/slow-ball.png'),
+        'time': BALL_SPEED_DURATION,
+        'conflicting-power': 'fast-ball'
+    },
+    'multiply-balls': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/multiply-balls.png'),
+        'time': -1,
+        'conflicting-power': None
+    },
+    'super-ball': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/super-ball.png'),
+        'time': BALL_STRENGTH_DURATION,
+        'conflicting-power': None
+    },
+    'big-paddle': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/big-paddle.png'),
+        'time': PADDLE_SIZE_DURATION,
+        'conflicting-power': 'small-paddle'
+    },
+    'small-paddle': {
+        'probability': 0.1,
+        'path': path_utils.get_asset_path('images/powerups/small-paddle.png'),
+        'time': PADDLE_SIZE_DURATION,
+        'conflicting-power': 'big-paddle'
+    },
 }
 
 # HEALTH

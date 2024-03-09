@@ -1,1 +1,1 @@
-from breakout import main, utils, screens, sprites, config, log
+from . import main, utils, screens, sprites, config, log
