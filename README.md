@@ -41,5 +41,9 @@ We've also added special power-ups to enhance your gaming experience even more!
 - [UML Diagrams](https://github.com/rkvcode/breakout/tree/master/UML) #To be modified
 
 ## Unit Tests
+To run tests: 
+
+python -m pytest ./tests
+
 - [Unit Tests](https://github.com/rkvcode/breakout/blob/master/src/test_unittest.py) #To be modified
 

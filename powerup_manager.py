@@ -105,7 +105,8 @@ class PowerUpManager:
 			if power not in ['add-life', 'multiply-balls']:
 				self.active_powerups.append(power)
 		except KeyError as e:
-			game_logger.error('Unknown power! Skip activating', str(e))
+			game_logger.error('Unknown power! Skip activating')
+			raise KeyError(e)
 
 	def activate_add_life(self):
 		"""

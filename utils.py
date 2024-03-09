@@ -3,7 +3,7 @@ from pathlib import Path
 base_path = Path(__file__).parent
 
 
-def get_asset_path(relative_path: str):
+def get_asset_path(relative_path: str) -> Path:
 	"""
 	Get the absolute path of an asset.
 
@@ -14,7 +14,7 @@ def get_asset_path(relative_path: str):
 		relative_path (pathlib.Path): Path of an asset in assets folder.
 
 	Returns:
-		str: An absolute path of an asset provided.
+		Path: An absolute path of an asset provided.
 	"""
 	asset_path = base_path.joinpath('assets', relative_path)
 	if asset_path.is_file():
