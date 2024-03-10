@@ -3,8 +3,14 @@ import pygame
 import math
 from breakout_game.config import settings
 
+from unittest.mock import Mock
 from breakout_game.sprites.sprite_manager import SpriteManager
 from breakout_game.sprites.sprite import Player, Score, Scoreboard, Ball, Block, Heart
+
+
+@pytest.fixture(autouse=True)
+def disable_sound(mocker):
+    mocker.patch.object(pygame, "mixer", new_callable=Mock)
 
 
 @pytest.fixture

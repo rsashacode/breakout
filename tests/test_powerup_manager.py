@@ -1,8 +1,14 @@
 import pytest
 import pygame
 
+from unittest.mock import Mock
 from breakout_game.sprites.powerup_manager import PowerUpManager
 from breakout_game.sprites import SpriteManager
+
+
+@pytest.fixture(autouse=True)
+def disable_sound(mocker):
+    mocker.patch.object(pygame, "mixer", new_callable=Mock)
 
 
 @pytest.fixture

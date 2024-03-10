@@ -60,6 +60,7 @@ class Game:
         self.end_game_menu: EndGameMenu = EndGameMenu()
 
         # Music
+
         menu_music_path: Path = path_utils.get_asset_path('sounds/menu.mp3')
         pygame.mixer.music.load(menu_music_path)
         pygame.mixer.music.set_volume(0.75)

@@ -46,6 +46,8 @@ We've also added special power-ups to enhance your gaming experience even more!
 - pygame==2.5.2
 - pydantic==2.6.3
 - pytest==8.0.2
+- pytest-mock==3.12.0
+- pylint==3.1.0
 
 ## Git Commit History
 - [Git Commit History](https://github.com/rkvcode/breakout/commits)
