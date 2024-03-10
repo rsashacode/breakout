@@ -58,5 +58,5 @@ To run tests:
 
 python -m pytest ./tests
 
-- [Unit Tests](https://github.com/rkvcode/breakout/blob/master/src/test_unittest.py) #To be modified
+- [Unit Tests](https://github.com/rkvcode/breakout/tree/main/tests) #To be modified
 
