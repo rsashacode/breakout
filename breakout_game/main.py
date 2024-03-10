@@ -1,15 +1,20 @@
-import logging
-import pygame
+"""
+Main module to start the program
+"""
 import sys
 import time
 
+from pathlib import Path
+
+import pygame
+import log
+
 from utils import path_utils
 from config import settings
-from pathlib import Path
-from sprites.sprite_manager import SpriteManager
+from sprites import SpriteManager
 from screens import MainMenu, LevelMenu, EndGameMenu, PauseMenu
 
-game_logger = logging.getLogger('')
+game_logger = log.game_logger
 
 
 class Game:
@@ -42,7 +47,7 @@ class Game:
 
     def __init__(self):
         # General Setup
-        pygame.init()
+        pygame.init()  # pylint: disable=E1101
         self.display_surface: pygame.Surface = pygame.display.set_mode((settings.WINDOW_WIDTH, settings.WINDOW_HEIGHT))
         self.title: str = 'Breakout Game'
         self.clock: pygame.time.Clock = pygame.time.Clock()
@@ -112,7 +117,7 @@ class Game:
         """
         background_path = path_utils.get_asset_path(f'images/background/level-{self.level}.jpg')
         self.background = pygame.image.load(background_path).convert()
-        self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)
+        self.background.fill((125, 125, 125), special_flags=pygame.BLEND_RGB_SUB)  # pylint: disable=E1101
         scale_factor = max([
             settings.WINDOW_HEIGHT / self.background.get_height(),
             settings.WINDOW_WIDTH / self.background.get_width()
@@ -120,7 +125,8 @@ class Game:
         scaled_width = self.background.get_width() * scale_factor
         scaled_height = self.background.get_height() * scale_factor
         self.background = pygame.transform.scale(self.background, (scaled_width, scaled_height))
-        game_logger.debug(f'Background {background_path} of level {self.level} is set')
+        game_logger.info('Background %(background_path)s of level %(level)s is set',
+                         {"background_path": background_path, "level": self.level})
 
     def load_level_music(self):
         """
@@ -130,7 +136,7 @@ class Game:
         level_music_path = path_utils.get_asset_path(f'sounds/level-{self.level}.mp3')
         pygame.mixer.music.load(level_music_path)
         pygame.mixer.music.play(fade_ms=1000)
-        game_logger.debug(f'Music {level_music_path} of level {self.level} started')
+        game_logger.debug('Music %s of level %s started', level_music_path, self.level)
 
     def check_level_finish(self):
         """
@@ -143,7 +149,7 @@ class Game:
             self.game_active = False
             self.level_menu.active = True
             self.level += 1
-            game_logger.info(f'The level {self.level} is finished')
+            game_logger.info('The level %s is finished', self.level)
 
     def check_end_game(self):
         """
@@ -152,7 +158,7 @@ class Game:
         if self.sprite_manager.player.health <= 0 or self.level > 6:
             self.game_active = False
             self.end_game_menu.active = True
-            game_logger.debug(f'The game has ended')
+            game_logger.debug('The game has ended')
 
     def check_events(self):
         """
@@ -166,20 +172,20 @@ class Game:
             3. The [escape] key is pressed -> activates menu and starts timer to prevent powerup timers from counting.
         """
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_logger.info(f'The game window is closed. Exiting...')
-                pygame.quit()
+            if event.type == pygame.QUIT:  # pylint: disable=E1101
+                game_logger.info('The game window is closed. Exiting...')
+                pygame.quit()  # pylint: disable=E1101
                 sys.exit()
 
         self.keys_pressed = pygame.key.get_pressed()
-        if self.keys_pressed[pygame.K_ESCAPE] and self.game_active:
+        if self.keys_pressed[pygame.K_ESCAPE] and self.game_active:  # pylint: disable=E1101
             self.pause_menu.active = True
             self.start_pause_time = time.time()
-            game_logger.info(f'Pause activated')
-        elif self.keys_pressed[pygame.K_q]:
-            game_logger.info(f'The [q] button is pressed. Exiting...')
-            pygame.quit()
-            sys.exit()
+            game_logger.info('Pause activated')
+        elif self.keys_pressed[pygame.K_q]:  # pylint: disable=E1101
+            game_logger.info('The [q] button is pressed. Exiting...')
+            pygame.quit()  # pylint: disable=E1101
+            sys.exit()  # pylint: disable=E1101
 
     def get_last_blit_main_menu(self) -> list[list]:
         """
@@ -244,7 +250,7 @@ class Game:
         self.sprite_manager.init_level(self.level, self.level_difficulty)
         self.load_level_music()
         self.game_active = True
-        game_logger.info(f'Stage of level {self.level} initialized')
+        game_logger.info('Stage of level %s initialized', self.level)
 
     def run_game(self, delta_time: float):
         """

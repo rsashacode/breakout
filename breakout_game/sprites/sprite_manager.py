@@ -1,16 +1,22 @@
+"""
+Sprite manager module
+"""
+
 from __future__ import annotations
 
-import pygame
 import random
 import math
 
 from typing import TYPE_CHECKING
-from breakout.config import settings
-from breakout.utils import path_utils
-from breakout.sprites.powerup_manager import PowerUpManager
+
+import pygame
+
+from config import settings
+from utils import path_utils
+from .powerup_manager import PowerUpManager
 
 if not TYPE_CHECKING:
-    from breakout.sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
+    from sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
 
 
 class SpriteManager:
@@ -101,7 +107,7 @@ class SpriteManager:
         """
         score_color = pygame.Color('white')
         score_font = pygame.font.Font(settings.GAME_FONT, size=settings.SCORE_FONT_SIZE)
-        score_image = score_font.render(f'Score: 0', True, score_color)
+        score_image = score_font.render('Score: 0', True, score_color)
         score_rect = score_image.get_rect(
             center=(settings.WINDOW_WIDTH - settings.SCOREBOARD_WIDTH // 2, settings.WINDOW_HEIGHT // 4))
         self.score = Score(
@@ -214,8 +220,8 @@ class SpriteManager:
         )
         new_ball.set_direction_from_angle(angle_radians)
 
-        for key in kwargs_to_ball:
-            new_ball.__setattr__(key, kwargs_to_ball[key])
+        for kwarg in kwargs_to_ball.items():
+            setattr(new_ball, kwarg[0], kwarg[1])
 
         self.balls.append(new_ball)
 
@@ -288,8 +294,7 @@ class SpriteManager:
         powerup_info_sprites = self.power_up_timer_info_group.sprites()
         for powerup_info_sprite in powerup_info_sprites:
             existing_power_names.append(powerup_info_sprite.power_name)
-            if powerup_info_sprite.rect.y > last_y:
-                last_y = powerup_info_sprite.rect.y
+            last_y = max(last_y, powerup_info_sprite.rect.y)
 
         color = pygame.Color('white')
         font = pygame.font.Font(settings.GAME_FONT, size=settings.POWERUP_FONT_SIZE)

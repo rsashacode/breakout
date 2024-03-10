@@ -1,13 +1,20 @@
+"""
+Module describing all sprite objects in the game.
+"""
+
 from __future__ import annotations
 
-import pygame
-from breakout.config import settings
-from breakout.utils import path_utils
 import math
 import time
 
-from breakout.sprites.powerup_manager import PowerUpManager
 from typing import TYPE_CHECKING
+
+import pygame
+
+from config import settings
+from utils import path_utils
+
+from sprites.powerup_manager import PowerUpManager
 
 if TYPE_CHECKING:
     from sprite_manager import SpriteManager
@@ -62,8 +69,8 @@ class _GameSprite(pygame.sprite.Sprite):
         self.image = image
         self.rect = rect
 
-        self.position = pygame.math.Vector2(self.rect.topleft)
-        self.direction = pygame.math.Vector2((0, 0))
+        self.position = pygame.math.Vector2(self.rect.topleft)  # pylint: disable=I1101
+        self.direction = pygame.math.Vector2((0, 0))  # pylint: disable=I1101
         self.speed = 0
 
         self.original_image = self.image.copy()
@@ -75,7 +82,7 @@ class _GameSprite(pygame.sprite.Sprite):
         """
         Updates the sprite based on the game logic.
         """
-        raise NotImplemented('Sprite class must implement "update" method')
+        raise NotImplementedError('Sprite class must implement "update" method')
 
     def movement(self, delta_time: (int, float)):
         """
@@ -170,7 +177,8 @@ class Heart(_GameSprite):
     ):
         super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
-    def update(self):
+    # pylint: disable=W0221
+    def update(self, *args, **kwargs):
         pass
 
 
@@ -234,6 +242,7 @@ class Player(_GameSprite):
             )
             self.sprite_manager.create_heart(midtop=heart_midtop)
 
+    # pylint: disable=W0221
     def update(self, delta_time: (int, float), keys_pressed: pygame.key.ScancodeWrapper):
         """
         Checks which keys are pressed and updates the paddle position.
@@ -242,9 +251,9 @@ class Player(_GameSprite):
             delta_time (int, float): The time passed since last frame.
             keys_pressed (pygame.key.ScancodeWrapper): Keys pressed.
         """
-        if keys_pressed[pygame.K_RIGHT]:
+        if keys_pressed[pygame.K_RIGHT]:  # pylint: disable=E1101
             self.direction.x = 1
-        elif keys_pressed[pygame.K_LEFT]:
+        elif keys_pressed[pygame.K_LEFT]:  # pylint: disable=E1101
             self.direction.x = -1
         else:
             self.direction.x = 0
@@ -283,13 +292,33 @@ class Score(_GameSprite):
         self.font: pygame.font.Font = font
         self.color: pygame.Color = color
 
-    def add_score(self, points):
+    def add_score(self, points: int):
+        """
+        Add score to the object.
+
+        Args:
+            points (int): Points to add.
+        """
         self.score += points
 
-    def subtract_score(self, points):
+    def subtract_score(self, points: int):
+        """
+        Subtract score from the object.
+
+        Args:
+            points (int): Points to subtract.
+
+        Returns:
+
+        """
         self.score -= points
 
-    def update(self):
+    def update(self, *args, **kwargs):
+        """
+        Update the score based on the new score and realign the text.
+        Returns:
+
+        """
         old_rect_center = self.rect.center
         self.image = self.font.render(f'Score: {self.score}', True, self.color)
         self.rect = self.image.get_rect(center=old_rect_center)
@@ -321,7 +350,7 @@ class PowerUp(_GameSprite):
     ):
         super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
-        self.direction = pygame.math.Vector2((0, 1))
+        self.direction = pygame.math.Vector2((0, 1))  # pylint: disable=I1101
         self.speed = settings.DEFAULT_POWERUP_SPEED
         self.power: str = power
         self.powerup_manager: PowerUpManager = powerup_manager
@@ -351,7 +380,7 @@ class PowerUp(_GameSprite):
         self.powerup_sound.stop()
         self.powerup_sound.play()
 
-    def update(self, delta_time: (int, float)):
+    def update(self, delta_time: (int, float)):  # pylint: disable=W0221
         """
         Update the position of the sprite and check if it hit the paddle.
 
@@ -432,7 +461,7 @@ class Block(_GameSprite):
             new_image = pygame.image.load(settings.COLOR_LEGEND[self.health])
             self.change_image(new_image, settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT)
 
-    def update(self):
+    def update(self, *args, **kwargs):
         """
         Update the sprite.
         """
@@ -467,7 +496,7 @@ class Ball(_GameSprite):
     ):
         super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
-        self.direction = pygame.math.Vector2((0, -1))
+        self.direction = pygame.math.Vector2((0, -1))  # pylint: disable=I1101
 
         self.speed = speed
         self.original_speed = speed
@@ -494,7 +523,7 @@ class Ball(_GameSprite):
         Args:
             angle (int, float): Angle in radians
         """
-        self.direction = pygame.math.Vector2((math.cos(angle), math.sin(angle)))
+        self.direction = pygame.math.Vector2((math.cos(angle), math.sin(angle)))  # pylint: disable=I1101
 
     def change_speed(self, new_speed: int):
         """
@@ -582,17 +611,13 @@ class Ball(_GameSprite):
         # Calculate the overall area of overlapping
         for sprite in colliding_sprites:
             overlap = self.rect.clip(sprite.rect)
-            if overlap.left < total_overlap_left:
-                total_overlap_left = overlap.left
-            if overlap.right > total_overlap_right:
-                total_overlap_right = overlap.right
-            if overlap.top < total_overlap_top:
-                total_overlap_top = overlap.top
-            if overlap.bottom > total_overlap_bottom:
-                total_overlap_bottom = overlap.bottom
+            total_overlap_left = min(total_overlap_left, overlap.left)
+            total_overlap_right = max(total_overlap_right, overlap.right)
+            total_overlap_top = min(total_overlap_top, overlap.top)
+            total_overlap_bottom = max(total_overlap_bottom, overlap.bottom)
 
         # Keyword arguments do not work here
-        overlap_rect = pygame.rect.Rect(
+        overlap_rect = pygame.rect.Rect(  # pylint: disable=I1101
             total_overlap_left,  # left
             total_overlap_top,  # top
             abs(total_overlap_right - total_overlap_left),  # width
@@ -737,6 +762,7 @@ class Ball(_GameSprite):
             self.position.x = self.rect.x
             self.position.y = self.rect.y
 
+    # pylint: disable=W0221
     def update(self, delta_time: (int, float), keys_pressed: pygame.key.ScancodeWrapper):
         """
         Update the status of the ball. Handle movement, collisions and activation.
@@ -757,11 +783,11 @@ class Ball(_GameSprite):
         else:
             if time.time() - self.time_delay_counter > 0.5:
                 self.rect.midbottom = self.sprite_manager.player_sprites_group.sprites()[0].rect.midtop
-                self.position = pygame.math.Vector2(self.rect.topleft)
+                self.position = pygame.math.Vector2(self.rect.topleft)  # pylint: disable=I1101
 
-                if keys_pressed[pygame.K_SPACE]:
+                if keys_pressed[pygame.K_SPACE]:  # pylint: disable=E1101
                     self.active = True
-                    self.direction = pygame.math.Vector2((0, -1))
+                    self.direction = pygame.math.Vector2((0, -1))  # pylint: disable=I1101
             else:
                 pass
 
@@ -779,7 +805,7 @@ class Scoreboard(_GameSprite):
     ):
         super().__init__(sprite_manager=sprite_manager, sprite_groups=sprite_groups, image=image, rect=rect)
 
-    def update(self):
+    def update(self, *args, **kwargs):
         pass
 
 
@@ -818,6 +844,7 @@ class PowerUpTimerInfo(_GameSprite):
         self.start_time = time.time()
         self.power_name = power_name
 
+    # pylint: disable=W0221
     def update(self, time_in_pause: (int, float) = 0):
         """
         Update the text.

@@ -1,15 +1,19 @@
+"""
+Module describing Powerup Manager and Timer.
+"""
 from __future__ import annotations
 
 import time
 import math
-from breakout.config import settings
 import logging
-import pygame
 
 from typing import TYPE_CHECKING
 
+import pygame
+from config import settings
+
 if TYPE_CHECKING:
-    from breakout.sprites.sprite_manager import SpriteManager
+    from breakout_game.sprites.sprite_manager import SpriteManager
 
 game_logger = logging.getLogger('')
 
@@ -106,7 +110,7 @@ class PowerUpManager:
                 self.active_powerups.append(power)
         except KeyError as e:
             game_logger.error('Unknown power! Skip activating')
-            raise KeyError(e)
+            raise KeyError from e
 
     def activate_add_life(self):
         """
@@ -244,7 +248,7 @@ class PowerUpManager:
         game_logger.info('Activating super-ball powerup')
         for ball in self.sprite_manager.ball_sprites_group.sprites():
             ball.change_strength(int(ball.original_strength * 2))
-            ball.image.fill((125, 0, 0), special_flags=pygame.BLEND_RGB_ADD)
+            ball.image.fill((125, 0, 0), special_flags=pygame.BLEND_RGB_ADD)  # pylint: disable=E1101
             if start_timer:
                 self.ball_strength_timer.start(settings.BALL_STRENGTH_DURATION)
 

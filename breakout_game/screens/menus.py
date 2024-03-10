@@ -1,8 +1,11 @@
-import pygame
-from breakout.config import settings
+"""
+Module describing all menus present in the game.
+"""
 import time
+import pygame
 
-from breakout.utils.path_utils import get_asset_path
+from utils.path_utils import get_asset_path
+from config import settings
 
 
 class MainMenu:
@@ -71,13 +74,13 @@ class MainMenu:
             keys_pressed (pygame.key.ScancodeWrapper): Keys pressed.
         """
         if time.time() - self.last_pressed >= 0.2:
-            if keys_pressed[pygame.K_UP]:
+            if keys_pressed[pygame.K_UP]:  # pylint: disable=E1101
                 self.selected_option = max(0, self.selected_option - 1)
                 self.last_pressed = time.time()
-            elif keys_pressed[pygame.K_DOWN]:
+            elif keys_pressed[pygame.K_DOWN]:  # pylint: disable=E1101
                 self.selected_option = min(len(self.options) - 1, self.selected_option + 1)
                 self.last_pressed = time.time()
-            elif keys_pressed[pygame.K_RETURN]:
+            elif keys_pressed[pygame.K_RETURN]:  # pylint: disable=E1101
                 if self.selected_option in [0, 1, 2]:
                     self.active = False
             self.update_objects_to_blit()
@@ -114,7 +117,7 @@ class LevelMenu:
         Args:
             keys_pressed (pygame.key.ScancodeWrapper): Keys pressed.
         """
-        if keys_pressed[pygame.K_RETURN]:
+        if keys_pressed[pygame.K_RETURN]:  # pylint: disable=E1101
             self.active = False
 
 
@@ -188,5 +191,11 @@ class PauseMenu:
         self.active = False
 
     def update(self, keys_pressed: pygame.key.ScancodeWrapper):
-        if keys_pressed[pygame.K_SPACE]:
+        """
+        Update the pause menu.
+
+        Args:
+            keys_pressed (pygame.key.ScancodeWrapper): Keys pressed.
+        """
+        if keys_pressed[pygame.K_SPACE]:  # pylint: disable=E1101
             self.active = False

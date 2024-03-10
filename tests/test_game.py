@@ -1,6 +1,6 @@
 import pygame
 
-from breakout.main import Game
+from breakout_game.main import Game
 
 
 def test_restart_game():

@@ -1,0 +1,4 @@
+[FORMAT]
+max-line-length=120
+
+init-hook='import sys; sys.path.append("breakout_game")'

@@ -1,8 +1,8 @@
 import pytest
 import pygame
 
-from breakout.sprites.powerup_manager import PowerUpManager
-from breakout.sprites import SpriteManager
+from breakout_game.sprites.powerup_manager import PowerUpManager
+from breakout_game.sprites import SpriteManager
 
 
 @pytest.fixture

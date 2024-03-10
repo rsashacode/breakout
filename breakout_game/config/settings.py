@@ -1,4 +1,8 @@
-from breakout.utils import path_utils
+"""
+Settings file. Edit with caution.
+"""
+
+from utils import path_utils
 
 # GRAPHICS
 
