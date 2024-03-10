@@ -8,6 +8,17 @@ It is possible to change the size of the game window by changing the value of **
 in the settings file
 [here](https://github.com/rkvcode/breakout/blob/main/breakout_game/config/settings.py)
 
+## Controls
+### Menu
+- up-arrow - go up
+- down-arrow - go down
+
+### Game
+- left-arrow - move paddle to the left
+- right-arrow - move paddle to the right
+- space - launch the ball
+- esc - pause the game
+
 There are two methods of installation:
 
 ## Method 1 (pip)
