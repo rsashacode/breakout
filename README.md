@@ -21,17 +21,11 @@ in the settings file
 
 There are two methods of installation:
 
-## Method 1 (pip)
-
-### Installation
+## Installation
+### Method 1 (pip)
     pip install -r -requirements.txt
-
-### Start
     python start.py
-
-## Method 2 (setuptools)
-
-### Installation
+### Method 2 (setuptools)
     python -m pip install --upgrade setuptools
     python setup.py install
 
