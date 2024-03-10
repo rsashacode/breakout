@@ -153,13 +153,13 @@ POWERS = {
 		'conflicting-power': 'fast-ball'
 	},
 	'multiply-balls': {
-		'probability': 0.1,
+		'probability': 0.9,
 		'path': path_utils.get_asset_path('images/powerups/multiply-balls.png'),
 		'time': -1,
 		'conflicting-power': None
 	},
 	'super-ball': {
-		'probability': 0.1,
+		'probability': 0.5,
 		'path': path_utils.get_asset_path('images/powerups/super-ball.png'),
 		'time': BALL_STRENGTH_DURATION,
 		'conflicting-power': None
