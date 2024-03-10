@@ -4,6 +4,18 @@
 A simple and fun breakout game to relive your childhood. Based on pygame framework.
 Game requires python 3.11.
 
+## Table of Contents
+
+- [Configuration](https://github.com/rkvcode/breakout#Configuration)
+- [Controls](https://github.com/rkvcode/breakout#Controls)
+- [Installation](https://github.com/rkvcode/breakout#Imstallation)
+- [Feature](https://github.com/rkvcode/breakout#Feature)
+- [Prerequisites](https://github.com/rkvcode/breakout#Prerequisites)
+- [Git Commit History](https://github.com/rkvcode/breakout#Git-Commit-History)
+- [UML Diagrams](https://github.com/rkvcode/breakout#UML-Diagrams)
+- [Unit Tests](https://github.com/rkvcode/breakout#Unit-Tests)
+
+## Configuration
 It is possible to change the size of the game window by changing the value of **SELECTED_RESOLUTION**
 in the settings file
 [here](https://github.com/rkvcode/breakout/blob/main/breakout_game/config/settings.py)
@@ -29,15 +41,6 @@ There are two methods of installation:
     python -m pip install --upgrade setuptools
     python setup.py install
     python -c "import breakout_game; breakout_game.start()"
-
-## Table of Contents
-
-- [Feature](https://github.com/rkvcode/breakout#Feature)
-- [Prerequisites](https://github.com/rkvcode/breakout#Prerequisites)
-- [Git Commit History](https://github.com/rkvcode/breakout#Git-Commit-History)
-- [UML Diagrams](https://github.com/rkvcode/breakout#UML-Diagrams)
-- [Unit Tests](https://github.com/rkvcode/breakout#Unit-Tests)
-
 
 ## Feature
 
