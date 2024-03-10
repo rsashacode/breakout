@@ -1,15 +1,28 @@
 
 # Breakout
 
-A simple and fun breakout game to relive your childhood. Framework:pygame
+A simple and fun breakout game to relive your childhood. Based on pygame framework.
 
-install instruction:
+Game requires python 3.11.
 
-1.installing dependencies via setup.py
+There are two methods of trying out this game.
 
-2.start the program: python main.py
+## Method 1 (pip)
 
+### Installation
+    pip install -r -requirements.txt
 
+### Start
+    python start.py
+
+## Method 2 (setuptools)
+
+### Installation
+    python -m pip install --upgrade setuptools
+    python setup.py install
+
+### Start
+    python -c "import breakout_game; breakout_game.start()"
 
 ## Table of Contents
 

@@ -1,6 +1,7 @@
 """
 Main module to start the program
 """
+import os
 import sys
 import time
 
@@ -328,4 +329,5 @@ def start():
 
 
 if __name__ == '__main__':
+    working_directory = os.getcwd()
     start()

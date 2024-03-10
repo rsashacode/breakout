@@ -9,13 +9,22 @@ required = [
 ]
 
 setup(
-    name='BreakoutGame',
+    name='breakout_game',
     version='1.0.0',
     author='Aleksandr Rykov, Liu Chen-Yu',
     author_email='your.email@example.com',
     description='A modern version of the classic Breakout game made with PyGame',
     packages=find_packages(),
     install_requires=required,
+    package_data={
+        'breakout_game': [
+            'assets/fonts/*',
+            'assets/images/background/*', 'assets/images/ball/*', 'assets/images/blocks/*', 'assets/images/hearts/*',
+            'assets/images/powerups/*',
+            'assets/sounds/*'
+        ]
+    },
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'breakout=breakout_game',
