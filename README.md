@@ -28,8 +28,6 @@ There are two methods of installation:
 ### Method 2 (setuptools)
     python -m pip install --upgrade setuptools
     python setup.py install
-
-### Start
     python -c "import breakout_game; breakout_game.start()"
 
 ## Table of Contents
