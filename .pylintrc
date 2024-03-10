@@ -1,5 +1,12 @@
 [FORMAT]
 max-line-length=120
 
+[DESIGN]
+max-attributes=20
+max-args=10
+
+[MESSAGES CONTROL]
+disable=consider-iterating-dictionary, too-few-public-methods, consider-using-dict-items
+
 [MASTER]
 init-hook='import sys; sys.path.append("breakout")'

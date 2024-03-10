@@ -2,7 +2,6 @@
 Utility functions for handling paths
 """
 
-import os
 from pathlib import Path
 
 base_path = Path(__file__).resolve().parent.parent
