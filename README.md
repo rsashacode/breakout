@@ -53,7 +53,7 @@ We've also added special power-ups to enhance your gaming experience even more!
 - [Git Commit History](https://github.com/rkvcode/breakout/commits)
 
 ## UML Diagrams
-- [UML Diagrams](https://github.com/rkvcode/breakout/tree/master/UML) #To be modified
+- [UML Diagrams](https://github.com/rkvcode/breakout/tree/master/UML)
 
 ## Unit Tests
 To run tests: 
