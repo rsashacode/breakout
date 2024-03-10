@@ -8,7 +8,7 @@ Game requires python 3.11.
 
 - [Configuration](https://github.com/rkvcode/breakout#Configuration)
 - [Controls](https://github.com/rkvcode/breakout#Controls)
-- [Installation](https://github.com/rkvcode/breakout#Imstallation)
+- [Installation](https://github.com/rkvcode/breakout#Installation)
 - [Feature](https://github.com/rkvcode/breakout#Feature)
 - [Prerequisites](https://github.com/rkvcode/breakout#Prerequisites)
 - [Git Commit History](https://github.com/rkvcode/breakout#Git-Commit-History)
