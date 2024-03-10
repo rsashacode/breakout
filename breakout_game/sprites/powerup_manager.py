@@ -10,7 +10,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import pygame
-from config import settings
+from breakout_game.config import settings
 
 if TYPE_CHECKING:
     from breakout_game.sprites.sprite_manager import SpriteManager

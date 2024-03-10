@@ -11,12 +11,12 @@ from typing import TYPE_CHECKING
 
 import pygame
 
-from config import settings
-from utils import path_utils
-from .powerup_manager import PowerUpManager
+from breakout_game.config import settings
+from breakout_game.utils import path_utils
+from breakout_game.sprites.powerup_manager import PowerUpManager
 
 if not TYPE_CHECKING:
-    from sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
+    from breakout_game.sprites.sprite import Player, Score, Heart, PowerUp, Ball, Block, Scoreboard, PowerUpTimerInfo
 
 
 class SpriteManager:

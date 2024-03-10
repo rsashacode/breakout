@@ -11,10 +11,9 @@ from typing import TYPE_CHECKING
 
 import pygame
 
-from config import settings
-from utils import path_utils
-
-from sprites.powerup_manager import PowerUpManager
+from breakout_game.config import settings
+from breakout_game.utils import path_utils
+from breakout_game.sprites.powerup_manager import PowerUpManager
 
 if TYPE_CHECKING:
     from sprite_manager import SpriteManager

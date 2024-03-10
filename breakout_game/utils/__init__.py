@@ -1,4 +1,4 @@
 """
 Utils package.
 """
-from utils import path_utils
+from breakout_game.utils import path_utils

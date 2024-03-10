@@ -7,12 +7,12 @@ import time
 from pathlib import Path
 
 import pygame
-import log
 
-from utils import path_utils
-from config import settings
-from sprites import SpriteManager
-from screens import MainMenu, LevelMenu, EndGameMenu, PauseMenu
+from breakout_game import log
+from breakout_game.utils import path_utils
+from breakout_game.config import settings
+from breakout_game.sprites import SpriteManager
+from breakout_game.screens import MainMenu, LevelMenu, EndGameMenu, PauseMenu
 
 game_logger = log.game_logger
 
@@ -319,6 +319,13 @@ class Game:
             self.draw_graphics(menu_objects_to_blit)
 
 
-if __name__ == '__main__':
+def start():
+    """
+    Start the game
+    """
     game = Game()
     game.run()
+
+
+if __name__ == '__main__':
+    start()

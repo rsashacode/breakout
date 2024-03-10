@@ -4,8 +4,8 @@ Module describing all menus present in the game.
 import time
 import pygame
 
-from utils.path_utils import get_asset_path
-from config import settings
+from breakout_game.utils.path_utils import get_asset_path
+from breakout_game.config import settings
 
 
 class MainMenu:

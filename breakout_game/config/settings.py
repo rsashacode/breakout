@@ -2,7 +2,7 @@
 Settings file. Edit with caution.
 """
 
-from utils import path_utils
+from breakout_game.utils import path_utils
 
 # GRAPHICS
 

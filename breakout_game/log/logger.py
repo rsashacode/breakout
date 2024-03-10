@@ -6,7 +6,7 @@ import logging.config
 
 from logging import LogRecord
 
-from utils.path_utils import base_path
+from breakout_game.utils.path_utils import base_path
 
 
 logging.config.dictConfig({'version': 1, 'disable_existing_loggers': True})
