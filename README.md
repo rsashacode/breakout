@@ -2,10 +2,13 @@
 # Breakout
 
 A simple and fun breakout game to relive your childhood. Based on pygame framework.
-
 Game requires python 3.11.
 
-There are two methods of trying out this game.
+It is possible to change the size of the game window by changing the value of **SELECTED_RESOLUTION**
+in the settings file
+[here](https://github.com/rkvcode/breakout/blob/main/breakout_game/config/settings.py)
+
+There are two methods of installation:
 
 ## Method 1 (pip)
 
@@ -35,6 +38,7 @@ There are two methods of trying out this game.
 
 ## Feature
 
+The game has three difficulty levels.
 Challenge three unique game modes, beyond the traditional paddle, ball, and blocks, 
 We've also added special power-ups to enhance your gaming experience even more!
 
