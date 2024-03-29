@@ -14,6 +14,7 @@ Game requires python 3.11.
 - [Git Commit History](https://github.com/rkvcode/breakout#Git-Commit-History)
 - [UML Diagrams](https://github.com/rkvcode/breakout#UML-Diagrams)
 - [Unit Tests](https://github.com/rkvcode/breakout#Unit-Tests)
+- [References](https://github.com/rkvcode/breakout#References)
 
 ## Configuration
 It is possible to change the size of the game window by changing the value of **SELECTED_RESOLUTION**
