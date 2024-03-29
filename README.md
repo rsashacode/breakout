@@ -72,3 +72,48 @@ python -m pytest ./tests
 
 - [Unit Tests](https://github.com/rkvcode/breakout/tree/main/tests)
 
+## References
+ 
+### Graphics
+- Ball image sourced from [manshagraphics](https://reurl.cc/A4o88e), with usage rights defined by the [License Agreement for Flaticon Content](https://reurl.cc/eL189L).
+- Heart image sourced from [opengameart](https://reurl.cc/097OMk), with usage rights defined by the [CC0 1.0 Universal](https://reurl.cc/N4V6mm).
+- Background graphics created with an assitance of DALL·E.
+ 
+### Background Music
+All background music tracks sourced from Pixabay, with usage rights defined under the [Pixabay Terms of Service](https://reurl.cc/v0V1Yl):
+- [Track 1](https://reurl.cc/mr8j9j)
+- [Track 2](https://reurl.cc/aLOjvY)
+- [Track 3](https://reurl.cc/lgmjd6)
+- [Track 4](https://reurl.cc/77Gvo1)
+- [Track 5](https://reurl.cc/yYdjgq)
+- [Track 6](https://reurl.cc/v0Yj1l)
+- [Track 7](https://reurl.cc/YVgr6L)
+ 
+### Menu Music
+All Menu music tracks sourced from FesliyanStudios, with usage rights defined under the [FesliyanStudios - FAQ / Policy](https://reurl.cc/RWx1qZ):
+- [Track 1](https://reurl.cc/aL2vdl)
+ 
+### Effect Sounds
+All effect sounds sourced from Pixabay:
+- [Effect Sound 1](https://reurl.cc/N4vm6n)
+- [Effect Sound 2](https://reurl.cc/nraj02)
+- [Effect Sound 3](https://reurl.cc/zl3jzk)
+- [Effect Sound 4](https://reurl.cc/xL5j0b)
+- [Effect Sound 5](https://reurl.cc/mrE9yW)
+ 
+### Power up icons
+- Power up icons and blocks designed using PowerPoint by ourselves.
+ 
+### Codebase Reference
+The final version is a fully original work.
+
+Some early commits may contain parts of code based on the tutorial "Breakout in python tutorial by Clear Code".
+- [Breakout in python tutorial by Clear Code](https://reurl.cc/YVy1Va).
+ 
+## Student Credentials
+- Full Name: Aleksandr Rykov
+- Matriculation Number: 3121337
+
+
+- Full Name: Chen-Yu Liu
+- Matriculation Number: 3121164
