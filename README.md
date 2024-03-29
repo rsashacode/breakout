@@ -73,7 +73,9 @@ python -m pytest ./tests
 - [Unit Tests](https://github.com/rkvcode/breakout/tree/main/tests)
 
 ## References
- 
+
+All assets used in the game are open-source, terms of use can be found in the links provided.
+
 ### Graphics
 - Ball image sourced from [manshagraphics](https://reurl.cc/A4o88e), with usage rights defined by the [License Agreement for Flaticon Content](https://reurl.cc/eL189L).
 - Heart image sourced from [opengameart](https://reurl.cc/097OMk), with usage rights defined by the [CC0 1.0 Universal](https://reurl.cc/N4V6mm).
