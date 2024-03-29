@@ -109,8 +109,7 @@ All effect sounds sourced from Pixabay:
 ### Codebase Reference
 The final version is a fully original work.
 
-Some early commits may contain parts of code based on the tutorial "Breakout in python tutorial by Clear Code".
-- [Breakout in python tutorial by Clear Code](https://reurl.cc/YVy1Va).
+Some early commits may contain parts of code based on the tutorial [Breakout in python tutorial by Clear Code](https://reurl.cc/YVy1Va).
  
 ## Student Credentials
 - Full Name: Aleksandr Rykov
