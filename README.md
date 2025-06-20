@@ -75,7 +75,7 @@ python -m pytest ./tests
 
 ## References
 
-All assets used in the game are open-source, terms of use can be found in the links provided.
+All assets used in the game are open-source, Terms of Use can be found via the links below.
 
 ### Graphics
 - Ball image sourced from [manshagraphics](https://reurl.cc/A4o88e), with usage rights defined by the [License Agreement for Flaticon Content](https://reurl.cc/eL189L).
@@ -105,17 +105,9 @@ All effect sounds sourced from Pixabay:
 - [Effect Sound 5](https://reurl.cc/mrE9yW)
  
 ### Power up icons
-- Power up icons and blocks designed using PowerPoint by ourselves.
+- Power up icons and blocks designed using PowerPoint.
  
 ### Codebase Reference
 The final version is a fully original work.
 
 Some early commits may contain parts of code based on the tutorial [Breakout in python tutorial by Clear Code](https://reurl.cc/YVy1Va).
- 
-## Student Credentials
-- Full Name: Aleksandr Rykov
-- Matriculation Number: 3121337
-
-
-- Full Name: Chen-Yu Liu
-- Matriculation Number: 3121164
